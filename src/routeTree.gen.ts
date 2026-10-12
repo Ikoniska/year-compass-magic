@@ -9,39 +9,60 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedMalRouteImport } from './routes/_authenticated/mal'
 import { Route as AuthenticatedReflektionRouteImport } from './routes/_authenticated/reflektion'
 import { Route as AuthenticatedTidslinjeRouteImport } from './routes/_authenticated/tidslinje'
 
-const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
-  id: '/_authenticated/',
-  path: '/',
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedMalRoute = AuthenticatedMalRouteImport.update({
-  id: '/_authenticated/mal',
+  id: '/mal',
   path: '/mal',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedReflektionRoute = AuthenticatedReflektionRouteImport.update({
-  id: '/_authenticated/reflektion',
+  id: '/reflektion',
   path: '/reflektion',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedTidslinjeRoute = AuthenticatedTidslinjeRouteImport.update({
-  id: '/_authenticated/tidslinje',
+  id: '/tidslinje',
   path: '/tidslinje',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof AuthenticatedIndexRoute
+  '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/mal': typeof AuthenticatedMalRoute
   '/reflektion': typeof AuthenticatedReflektionRoute
   '/tidslinje': typeof AuthenticatedTidslinjeRoute
-  '/': typeof AuthenticatedIndexRoute
 }
 export interface FileRoutesByTo {
+  '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/mal': typeof AuthenticatedMalRoute
   '/reflektion': typeof AuthenticatedReflektionRoute
   '/tidslinje': typeof AuthenticatedTidslinjeRoute
@@ -49,6 +70,9 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/mal': typeof AuthenticatedMalRoute
   '/_authenticated/reflektion': typeof AuthenticatedReflektionRoute
   '/_authenticated/tidslinje': typeof AuthenticatedTidslinjeRoute
@@ -56,11 +80,15 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/mal' | '/reflektion' | '/tidslinje' | '/'
+  fullPaths:
+    '/' | '/auth' | '/reset-password' | '/mal' | '/reflektion' | '/tidslinje'
   fileRoutesByTo: FileRoutesByTo
-  to: '/mal' | '/reflektion' | '/tidslinje' | '/'
+  to: '/auth' | '/reset-password' | '/mal' | '/reflektion' | '/tidslinje' | '/'
   id:
     | '__root__'
+    | '/_authenticated'
+    | '/auth'
+    | '/reset-password'
     | '/_authenticated/mal'
     | '/_authenticated/reflektion'
     | '/_authenticated/tidslinje'
@@ -68,50 +96,86 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  AuthenticatedMalRoute: typeof AuthenticatedMalRoute
-  AuthenticatedReflektionRoute: typeof AuthenticatedReflektionRoute
-  AuthenticatedTidslinjeRoute: typeof AuthenticatedTidslinjeRoute
-  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/': {
       id: '/_authenticated/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/mal': {
       id: '/_authenticated/mal'
       path: '/mal'
       fullPath: '/mal'
       preLoaderRoute: typeof AuthenticatedMalRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/reflektion': {
       id: '/_authenticated/reflektion'
       path: '/reflektion'
       fullPath: '/reflektion'
       preLoaderRoute: typeof AuthenticatedReflektionRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/tidslinje': {
       id: '/_authenticated/tidslinje'
       path: '/tidslinje'
       fullPath: '/tidslinje'
       preLoaderRoute: typeof AuthenticatedTidslinjeRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
 
-const rootRouteChildren: RootRouteChildren = {
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedMalRoute: typeof AuthenticatedMalRoute
+  AuthenticatedReflektionRoute: typeof AuthenticatedReflektionRoute
+  AuthenticatedTidslinjeRoute: typeof AuthenticatedTidslinjeRoute
+  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMalRoute: AuthenticatedMalRoute,
   AuthenticatedReflektionRoute: AuthenticatedReflektionRoute,
   AuthenticatedTidslinjeRoute: AuthenticatedTidslinjeRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
+const rootRouteChildren: RootRouteChildren = {
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

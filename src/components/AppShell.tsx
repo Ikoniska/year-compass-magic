@@ -1,6 +1,8 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate, useRouteContext } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, type ReactNode } from "react";
-import { LayoutGrid, Target, GanttChart, NotebookPen, Moon, Sun } from "lucide-react";
+import { LayoutGrid, Target, GanttChart, NotebookPen, Moon, Sun, LogOut } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const NAV = [
   { to: "/", label: "Översikt", icon: LayoutGrid },
@@ -22,6 +24,16 @@ function ThemeToggle() {
 }
 
 export function AppShell({ children }: { children: ReactNode }) {
+  const { user } = useRouteContext({ from: "/_authenticated" });
+  const email = user.email ?? "";
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  async function signOut() {
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    await supabase.auth.signOut();
+    navigate({ to: "/auth", replace: true });
+  }
   return (
     <div className="min-h-screen md:flex">
       <aside className="hidden w-60 shrink-0 flex-col border-r bg-sidebar p-4 md:flex md:sticky md:top-0 md:h-screen">
@@ -38,12 +50,20 @@ export function AppShell({ children }: { children: ReactNode }) {
             </Link>
           ))}
         </nav>
-        <div className="mt-auto flex items-center justify-between px-2 text-xs text-muted-foreground">
-          <span>{new Date().getFullYear()}</span><ThemeToggle />
+        <div className="mt-auto space-y-3 px-2 text-xs text-muted-foreground">
+          <div className="truncate" title={email}>{email}</div>
+          <div className="flex items-center justify-between">
+            <button onClick={signOut} className="flex items-center gap-1.5 hover:text-foreground"><LogOut size={14} /> Logga ut</button>
+            <ThemeToggle />
+          </div>
         </div>
       </aside>
       <header className="sticky top-0 z-30 flex items-center justify-between border-b bg-background/85 px-4 py-3 backdrop-blur md:hidden">
-        <span className="font-display text-lg font-semibold">Årsplan</span><ThemeToggle />
+        <span className="font-display text-lg font-semibold">Årsplan</span>
+        <div className="flex items-center gap-2">
+          <button aria-label="Logga ut" onClick={signOut} className="rounded-lg border bg-card p-2 text-muted-foreground hover:text-foreground"><LogOut size={16} /></button>
+          <ThemeToggle />
+        </div>
       </header>
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-24 pt-6 md:px-10 md:pb-10 md:pt-10">{children}</main>
       <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 border-t bg-background/95 backdrop-blur md:hidden">
