@@ -14,7 +14,93 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      events: {
+        Row: {
+          category: string
+          created_at: string
+          day: number
+          id: string
+          month: number
+          title: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          day: number
+          id?: string
+          month: number
+          title: string
+          user_id?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          day?: number
+          id?: string
+          month?: number
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      goals: {
+        Row: {
+          category: string
+          created_at: string
+          end_month: number
+          id: string
+          milestones: Json
+          start_month: number
+          status: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          end_month?: number
+          id?: string
+          milestones?: Json
+          start_month?: number
+          status?: string
+          title: string
+          user_id?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          end_month?: number
+          id?: string
+          milestones?: Json
+          start_month?: number
+          status?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      reflections: {
+        Row: {
+          answers: Json
+          period_key: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          answers?: Json
+          period_key: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          answers?: Json
+          period_key?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
