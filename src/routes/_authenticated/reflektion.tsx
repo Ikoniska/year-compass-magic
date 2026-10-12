@@ -3,7 +3,7 @@ import { useState } from "react";
 import { PageHeader } from "@/components/AppShell";
 import { MONTHS, usePlanner } from "@/lib/planner";
 
-export const Route = createFileRoute("/reflektion")({
+export const Route = createFileRoute("/_authenticated/reflektion")({
   head: () => ({
     meta: [
       { title: "Reflektion – Årsplan" },

@@ -5,7 +5,7 @@ import { PageHeader } from "@/components/AppShell";
 import { GoalDialog, btnPrimary } from "@/components/Dialogs";
 import { CATEGORIES, MONTHS_SHORT, STATUSES, cat, goalProgress, statusLabel, usePlanner, type Category, type Goal } from "@/lib/planner";
 
-export const Route = createFileRoute("/mal")({
+export const Route = createFileRoute("/_authenticated/mal")({
   head: () => ({
     meta: [
       { title: "Mål – Årsplan" },

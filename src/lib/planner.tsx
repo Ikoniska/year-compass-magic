@@ -1,4 +1,6 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export type Category = "arbete" | "halsa" | "ekonomi" | "utveckling" | "relationer";
 export type Status = "ej" | "inledd" | "halvvags" | "slutford";
@@ -31,72 +33,86 @@ export interface Goal {
 export interface PlanEvent { id: string; title: string; month: number; day: number; category: Category }
 export type Reflections = Record<string, Record<string, string>>;
 
-const uid = () => Math.random().toString(36).slice(2, 9);
-const ms = (...t: [string, boolean][]) => t.map(([title, done]) => ({ id: uid(), title, done }));
-
-const MOCK_GOALS: Goal[] = [
-  { id: uid(), title: "Lansera ny produktversion", category: "arbete", status: "halvvags", start: 1, end: 5, milestones: ms(["Kravspec klar", true], ["Beta till kunder", true], ["Lansering", false]) },
-  { id: uid(), title: "Springa ett halvmaraton", category: "halsa", status: "slutford", start: 0, end: 4, milestones: ms(["Springa 5 km", true], ["Springa 15 km", true], ["Göteborgsvarvet", true]) },
-  { id: uid(), title: "Spara 60 000 kr buffert", category: "ekonomi", status: "inledd", start: 0, end: 11, milestones: ms(["Budget i ordning", true], ["30 000 kr", false], ["60 000 kr", false]) },
-  { id: uid(), title: "Läsa 24 böcker", category: "utveckling", status: "halvvags", start: 0, end: 11, milestones: ms(["6 böcker", true], ["12 böcker", true], ["18 böcker", false], ["24 böcker", false]) },
-  { id: uid(), title: "Lära mig spanska (A2)", category: "utveckling", status: "ej", start: 8, end: 11, milestones: ms(["Välj kurs", false], ["Klara A1", false]) },
-  { id: uid(), title: "Familjeresa till Japan", category: "relationer", status: "inledd", start: 5, end: 9, milestones: ms(["Boka flyg", true], ["Planera rutt", false]) },
-  { id: uid(), title: "Ledarskapsutbildning", category: "arbete", status: "slutford", start: 2, end: 3, milestones: ms(["Modul 1", true], ["Modul 2", true]) },
-  { id: uid(), title: "Styrketräna 3 ggr/vecka", category: "halsa", status: "inledd", start: 6, end: 11, milestones: ms(["Skaffa gymkort", true], ["Träningsschema", false]) },
-];
-const MOCK_EVENTS: PlanEvent[] = [
-  { id: uid(), title: "Kvartalsplanering", month: 0, day: 8, category: "arbete" },
-  { id: uid(), title: "Göteborgsvarvet", month: 4, day: 23, category: "halsa" },
-  { id: uid(), title: "Mammas 60-årsdag", month: 6, day: 14, category: "relationer" },
-  { id: uid(), title: "Deklaration", month: 3, day: 30, category: "ekonomi" },
-  { id: uid(), title: "Konferens i Berlin", month: 9, day: 5, category: "arbete" },
-  { id: uid(), title: "Avresa Tokyo", month: 8, day: 2, category: "relationer" },
-  { id: uid(), title: "Årsbokslut privatekonomi", month: 11, day: 28, category: "ekonomi" },
-];
-const MOCK_REFL: Reflections = {
-  "m-0": { good: "Kom igång med löpningen och höll budgeten.", improve: "Mer fokus på djuparbete på jobbet.", learn: "Små dagliga vanor slår stora ryck." },
-  "q-0": { good: "Kravspecen blev klar före plan.", improve: "Sömnen har varit ojämn.", learn: "Planera veckan på söndagar." },
-};
+const uid = () => crypto.randomUUID();
 
 interface Ctx {
-  goals: Goal[]; events: PlanEvent[]; reflections: Reflections;
+  goals: Goal[]; events: PlanEvent[]; reflections: Reflections; loading: boolean;
   saveGoal: (g: Goal) => void; deleteGoal: (id: string) => void;
   saveEvent: (e: PlanEvent) => void; deleteEvent: (id: string) => void;
   setReflection: (key: string, q: string, v: string) => void;
   newId: () => string;
 }
 const PlannerCtx = createContext<Ctx | null>(null);
-const KEY = "arsplan-v1";
+
+const fail = (error: { message: string } | null) => { if (error) toast.error("Kunde inte spara: " + error.message); };
 
 export function PlannerProvider({ children }: { children: ReactNode }) {
-  const [goals, setGoals] = useState<Goal[]>(MOCK_GOALS);
-  const [events, setEvents] = useState<PlanEvent[]>(MOCK_EVENTS);
-  const [reflections, setRefl] = useState<Reflections>(MOCK_REFL);
-  const [loaded, setLoaded] = useState(false);
+  const [goals, setGoals] = useState<Goal[]>([]);
+  const [events, setEvents] = useState<PlanEvent[]>([]);
+  const [reflections, setRefl] = useState<Reflections>({});
+  const [loading, setLoading] = useState(true);
+  const timers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(KEY);
-      if (raw) { const d = JSON.parse(raw); setGoals(d.goals); setEvents(d.events); setRefl(d.reflections); }
-    } catch { /* ignore */ }
-    setLoaded(true);
+    (async () => {
+      const [g, e, r] = await Promise.all([
+        supabase.from("goals").select("*").order("created_at"),
+        supabase.from("events").select("*").order("created_at"),
+        supabase.from("reflections").select("*"),
+      ]);
+      setGoals((g.data ?? []).map((x) => ({
+        id: x.id, title: x.title, category: x.category as Category, status: x.status as Status,
+        start: x.start_month, end: x.end_month, milestones: (x.milestones as unknown as Milestone[]) ?? [],
+      })));
+      setEvents((e.data ?? []).map((x) => ({ id: x.id, title: x.title, month: x.month, day: x.day, category: x.category as Category })));
+      setRefl(Object.fromEntries((r.data ?? []).map((x) => [x.period_key, x.answers as Record<string, string>])));
+      setLoading(false);
+    })();
   }, []);
-  useEffect(() => {
-    if (loaded) localStorage.setItem(KEY, JSON.stringify({ goals, events, reflections }));
-  }, [goals, events, reflections, loaded]);
 
   const upsert = <T extends { id: string }>(list: T[], item: T) =>
     list.some((x) => x.id === item.id) ? list.map((x) => (x.id === item.id ? item : x)) : [...list, item];
 
+  const saveGoal = (g: Goal) => {
+    setGoals((l) => upsert(l, g));
+    supabase.from("goals").upsert({
+      id: g.id, title: g.title, category: g.category, status: g.status,
+      start_month: g.start, end_month: g.end, milestones: g.milestones as never,
+    }).then(({ error }) => fail(error));
+  };
+  const deleteGoal = (id: string) => {
+    setGoals((l) => l.filter((g) => g.id !== id));
+    supabase.from("goals").delete().eq("id", id).then(({ error }) => fail(error));
+  };
+  const saveEvent = (e: PlanEvent) => {
+    setEvents((l) => upsert(l, e));
+    supabase.from("events").upsert({ id: e.id, title: e.title, month: e.month, day: e.day, category: e.category })
+      .then(({ error }) => fail(error));
+  };
+  const deleteEvent = (id: string) => {
+    setEvents((l) => l.filter((e) => e.id !== id));
+    supabase.from("events").delete().eq("id", id).then(({ error }) => fail(error));
+  };
+  const setReflection = (key: string, q: string, v: string) => {
+    setRefl((r) => {
+      const answers = { ...r[key], [q]: v };
+      clearTimeout(timers.current[key]);
+      timers.current[key] = setTimeout(async () => {
+        const { data } = await supabase.auth.getUser();
+        if (!data.user) return;
+        const { error } = await supabase.from("reflections").upsert({
+          user_id: data.user.id, period_key: key, answers, updated_at: new Date().toISOString(),
+        });
+        fail(error);
+      }, 600);
+      return { ...r, [key]: answers };
+    });
+  };
+
   return (
-    <PlannerCtx.Provider value={{
-      goals, events, reflections, newId: uid,
-      saveGoal: (g) => setGoals((l) => upsert(l, g)),
-      deleteGoal: (id) => setGoals((l) => l.filter((g) => g.id !== id)),
-      saveEvent: (e) => setEvents((l) => upsert(l, e)),
-      deleteEvent: (id) => setEvents((l) => l.filter((e) => e.id !== id)),
-      setReflection: (key, q, v) => setRefl((r) => ({ ...r, [key]: { ...r[key], [q]: v } })),
-    }}>{children}</PlannerCtx.Provider>
+    <PlannerCtx.Provider value={{ goals, events, reflections, loading, newId: uid, saveGoal, deleteGoal, saveEvent, deleteEvent, setReflection }}>
+      {children}
+    </PlannerCtx.Provider>
   );
 }
 export const usePlanner = () => useContext(PlannerCtx)!;

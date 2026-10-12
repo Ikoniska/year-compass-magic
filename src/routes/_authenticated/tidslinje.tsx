@@ -5,7 +5,7 @@ import { PageHeader } from "@/components/AppShell";
 import { EventDialog, GoalDialog, btnGhost } from "@/components/Dialogs";
 import { MONTHS_SHORT, cat, goalProgress, usePlanner, type Goal, type PlanEvent } from "@/lib/planner";
 
-export const Route = createFileRoute("/tidslinje")({
+export const Route = createFileRoute("/_authenticated/tidslinje")({
   head: () => ({
     meta: [
       { title: "Tidslinje – Årsplan" },
