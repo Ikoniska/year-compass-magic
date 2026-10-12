@@ -10,33 +10,63 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MalRouteImport } from './routes/mal'
+import { Route as ReflektionRouteImport } from './routes/reflektion'
+import { Route as TidslinjeRouteImport } from './routes/tidslinje'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MalRoute = MalRouteImport.update({
+  id: '/mal',
+  path: '/mal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReflektionRoute = ReflektionRouteImport.update({
+  id: '/reflektion',
+  path: '/reflektion',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TidslinjeRoute = TidslinjeRouteImport.update({
+  id: '/tidslinje',
+  path: '/tidslinje',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/mal': typeof MalRoute
+  '/reflektion': typeof ReflektionRoute
+  '/tidslinje': typeof TidslinjeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/mal': typeof MalRoute
+  '/reflektion': typeof ReflektionRoute
+  '/tidslinje': typeof TidslinjeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/mal': typeof MalRoute
+  '/reflektion': typeof ReflektionRoute
+  '/tidslinje': typeof TidslinjeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/mal' | '/reflektion' | '/tidslinje'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/mal' | '/reflektion' | '/tidslinje'
+  id: '__root__' | '/' | '/mal' | '/reflektion' | '/tidslinje'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  MalRoute: typeof MalRoute
+  ReflektionRoute: typeof ReflektionRoute
+  TidslinjeRoute: typeof TidslinjeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +78,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mal': {
+      id: '/mal'
+      path: '/mal'
+      fullPath: '/mal'
+      preLoaderRoute: typeof MalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reflektion': {
+      id: '/reflektion'
+      path: '/reflektion'
+      fullPath: '/reflektion'
+      preLoaderRoute: typeof ReflektionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tidslinje': {
+      id: '/tidslinje'
+      path: '/tidslinje'
+      fullPath: '/tidslinje'
+      preLoaderRoute: typeof TidslinjeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  MalRoute: MalRoute,
+  ReflektionRoute: ReflektionRoute,
+  TidslinjeRoute: TidslinjeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
