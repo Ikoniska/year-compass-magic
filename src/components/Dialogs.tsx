@@ -21,7 +21,7 @@ const label = "mb-1.5 block text-xs font-medium text-muted-foreground";
 export const btnPrimary = "inline-flex items-center justify-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90";
 export const btnGhost = "inline-flex items-center justify-center gap-1.5 rounded-lg border bg-card px-4 py-2 text-sm font-medium transition hover:bg-muted";
 
-export function GoalDialog({ goal, onClose }: { goal?: Goal; onClose: () => void }) {
+export function GoalDialog({ goal, onClose }: { goal?: Goal | undefined; onClose: () => void }) {
   const { saveGoal, deleteGoal, newId } = usePlanner();
   const [g, setG] = useState<Goal>(goal ?? { id: newId(), title: "", category: "arbete", status: "ej", start: new Date().getMonth(), end: Math.min(11, new Date().getMonth() + 2), milestones: [] });
   const [ms, setMs] = useState("");
@@ -79,7 +79,7 @@ export function GoalDialog({ goal, onClose }: { goal?: Goal; onClose: () => void
   );
 }
 
-export function EventDialog({ event, onClose }: { event?: PlanEvent; onClose: () => void }) {
+export function EventDialog({ event, onClose }: { event?: PlanEvent | undefined; onClose: () => void }) {
   const { saveEvent, deleteEvent, newId } = usePlanner();
   const [e, setE] = useState<PlanEvent>(event ?? { id: newId(), title: "", month: new Date().getMonth(), day: 1, category: "arbete" });
   const set = (p: Partial<PlanEvent>) => setE((x) => ({ ...x, ...p }));
