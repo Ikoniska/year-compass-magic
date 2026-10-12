@@ -9,104 +9,109 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as MalRouteImport } from './routes/mal'
-import { Route as ReflektionRouteImport } from './routes/reflektion'
-import { Route as TidslinjeRouteImport } from './routes/tidslinje'
+import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedMalRouteImport } from './routes/_authenticated/mal'
+import { Route as AuthenticatedReflektionRouteImport } from './routes/_authenticated/reflektion'
+import { Route as AuthenticatedTidslinjeRouteImport } from './routes/_authenticated/tidslinje'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
+const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
+  id: '/_authenticated/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MalRoute = MalRouteImport.update({
-  id: '/mal',
+const AuthenticatedMalRoute = AuthenticatedMalRouteImport.update({
+  id: '/_authenticated/mal',
   path: '/mal',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ReflektionRoute = ReflektionRouteImport.update({
-  id: '/reflektion',
+const AuthenticatedReflektionRoute = AuthenticatedReflektionRouteImport.update({
+  id: '/_authenticated/reflektion',
   path: '/reflektion',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TidslinjeRoute = TidslinjeRouteImport.update({
-  id: '/tidslinje',
+const AuthenticatedTidslinjeRoute = AuthenticatedTidslinjeRouteImport.update({
+  id: '/_authenticated/tidslinje',
   path: '/tidslinje',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/mal': typeof MalRoute
-  '/reflektion': typeof ReflektionRoute
-  '/tidslinje': typeof TidslinjeRoute
+  '/mal': typeof AuthenticatedMalRoute
+  '/reflektion': typeof AuthenticatedReflektionRoute
+  '/tidslinje': typeof AuthenticatedTidslinjeRoute
+  '/': typeof AuthenticatedIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/mal': typeof MalRoute
-  '/reflektion': typeof ReflektionRoute
-  '/tidslinje': typeof TidslinjeRoute
+  '/mal': typeof AuthenticatedMalRoute
+  '/reflektion': typeof AuthenticatedReflektionRoute
+  '/tidslinje': typeof AuthenticatedTidslinjeRoute
+  '/': typeof AuthenticatedIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/mal': typeof MalRoute
-  '/reflektion': typeof ReflektionRoute
-  '/tidslinje': typeof TidslinjeRoute
+  '/_authenticated/mal': typeof AuthenticatedMalRoute
+  '/_authenticated/reflektion': typeof AuthenticatedReflektionRoute
+  '/_authenticated/tidslinje': typeof AuthenticatedTidslinjeRoute
+  '/_authenticated/': typeof AuthenticatedIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/mal' | '/reflektion' | '/tidslinje'
+  fullPaths: '/mal' | '/reflektion' | '/tidslinje' | '/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/mal' | '/reflektion' | '/tidslinje'
-  id: '__root__' | '/' | '/mal' | '/reflektion' | '/tidslinje'
+  to: '/mal' | '/reflektion' | '/tidslinje' | '/'
+  id:
+    | '__root__'
+    | '/_authenticated/mal'
+    | '/_authenticated/reflektion'
+    | '/_authenticated/tidslinje'
+    | '/_authenticated/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  MalRoute: typeof MalRoute
-  ReflektionRoute: typeof ReflektionRoute
-  TidslinjeRoute: typeof TidslinjeRoute
+  AuthenticatedMalRoute: typeof AuthenticatedMalRoute
+  AuthenticatedReflektionRoute: typeof AuthenticatedReflektionRoute
+  AuthenticatedTidslinjeRoute: typeof AuthenticatedTidslinjeRoute
+  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_authenticated/': {
+      id: '/_authenticated/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+      preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/mal': {
-      id: '/mal'
+    '/_authenticated/mal': {
+      id: '/_authenticated/mal'
       path: '/mal'
       fullPath: '/mal'
-      preLoaderRoute: typeof MalRouteImport
+      preLoaderRoute: typeof AuthenticatedMalRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/reflektion': {
-      id: '/reflektion'
+    '/_authenticated/reflektion': {
+      id: '/_authenticated/reflektion'
       path: '/reflektion'
       fullPath: '/reflektion'
-      preLoaderRoute: typeof ReflektionRouteImport
+      preLoaderRoute: typeof AuthenticatedReflektionRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/tidslinje': {
-      id: '/tidslinje'
+    '/_authenticated/tidslinje': {
+      id: '/_authenticated/tidslinje'
       path: '/tidslinje'
       fullPath: '/tidslinje'
-      preLoaderRoute: typeof TidslinjeRouteImport
+      preLoaderRoute: typeof AuthenticatedTidslinjeRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  MalRoute: MalRoute,
-  ReflektionRoute: ReflektionRoute,
-  TidslinjeRoute: TidslinjeRoute,
+  AuthenticatedMalRoute: AuthenticatedMalRoute,
+  AuthenticatedReflektionRoute: AuthenticatedReflektionRoute,
+  AuthenticatedTidslinjeRoute: AuthenticatedTidslinjeRoute,
+  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
