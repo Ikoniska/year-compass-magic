@@ -9,15 +9,21 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedMalRouteImport } from './routes/_authenticated/mal'
+import { Route as AuthenticatedOversiktRouteImport } from './routes/_authenticated/oversikt'
 import { Route as AuthenticatedRapportRouteImport } from './routes/_authenticated/rapport'
 import { Route as AuthenticatedReflektionRouteImport } from './routes/_authenticated/reflektion'
 import { Route as AuthenticatedTidslinjeRouteImport } from './routes/_authenticated/tidslinje'
 
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -32,14 +38,14 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedMalRoute = AuthenticatedMalRouteImport.update({
   id: '/mal',
   path: '/mal',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedOversiktRoute = AuthenticatedOversiktRouteImport.update({
+  id: '/oversikt',
+  path: '/oversikt',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedRapportRoute = AuthenticatedRapportRouteImport.update({
@@ -59,33 +65,36 @@ const AuthenticatedTidslinjeRoute = AuthenticatedTidslinjeRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof AuthenticatedIndexRoute
+  '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/mal': typeof AuthenticatedMalRoute
+  '/oversikt': typeof AuthenticatedOversiktRoute
   '/rapport': typeof AuthenticatedRapportRoute
   '/reflektion': typeof AuthenticatedReflektionRoute
   '/tidslinje': typeof AuthenticatedTidslinjeRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/mal': typeof AuthenticatedMalRoute
+  '/oversikt': typeof AuthenticatedOversiktRoute
   '/rapport': typeof AuthenticatedRapportRoute
   '/reflektion': typeof AuthenticatedReflektionRoute
   '/tidslinje': typeof AuthenticatedTidslinjeRoute
-  '/': typeof AuthenticatedIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/mal': typeof AuthenticatedMalRoute
+  '/_authenticated/oversikt': typeof AuthenticatedOversiktRoute
   '/_authenticated/rapport': typeof AuthenticatedRapportRoute
   '/_authenticated/reflektion': typeof AuthenticatedReflektionRoute
   '/_authenticated/tidslinje': typeof AuthenticatedTidslinjeRoute
-  '/_authenticated/': typeof AuthenticatedIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -94,31 +103,35 @@ export interface FileRouteTypes {
     | '/auth'
     | '/reset-password'
     | '/mal'
+    | '/oversikt'
     | '/rapport'
     | '/reflektion'
     | '/tidslinje'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/'
     | '/auth'
     | '/reset-password'
     | '/mal'
+    | '/oversikt'
     | '/rapport'
     | '/reflektion'
     | '/tidslinje'
-    | '/'
   id:
     | '__root__'
+    | '/'
     | '/_authenticated'
     | '/auth'
     | '/reset-password'
     | '/_authenticated/mal'
+    | '/_authenticated/oversikt'
     | '/_authenticated/rapport'
     | '/_authenticated/reflektion'
     | '/_authenticated/tidslinje'
-    | '/_authenticated/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -126,6 +139,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
@@ -147,18 +167,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/': {
-      id: '/_authenticated/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/mal': {
       id: '/_authenticated/mal'
       path: '/mal'
       fullPath: '/mal'
       preLoaderRoute: typeof AuthenticatedMalRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/oversikt': {
+      id: '/_authenticated/oversikt'
+      path: '/oversikt'
+      fullPath: '/oversikt'
+      preLoaderRoute: typeof AuthenticatedOversiktRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/rapport': {
@@ -187,24 +207,25 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedMalRoute: typeof AuthenticatedMalRoute
+  AuthenticatedOversiktRoute: typeof AuthenticatedOversiktRoute
   AuthenticatedRapportRoute: typeof AuthenticatedRapportRoute
   AuthenticatedReflektionRoute: typeof AuthenticatedReflektionRoute
   AuthenticatedTidslinjeRoute: typeof AuthenticatedTidslinjeRoute
-  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMalRoute: AuthenticatedMalRoute,
+  AuthenticatedOversiktRoute: AuthenticatedOversiktRoute,
   AuthenticatedRapportRoute: AuthenticatedRapportRoute,
   AuthenticatedReflektionRoute: AuthenticatedReflektionRoute,
   AuthenticatedTidslinjeRoute: AuthenticatedTidslinjeRoute,
-  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ResetPasswordRoute: ResetPasswordRoute,
