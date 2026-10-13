@@ -14,6 +14,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedMalRouteImport } from './routes/_authenticated/mal'
+import { Route as AuthenticatedRapportRouteImport } from './routes/_authenticated/rapport'
 import { Route as AuthenticatedReflektionRouteImport } from './routes/_authenticated/reflektion'
 import { Route as AuthenticatedTidslinjeRouteImport } from './routes/_authenticated/tidslinje'
 
@@ -41,6 +42,11 @@ const AuthenticatedMalRoute = AuthenticatedMalRouteImport.update({
   path: '/mal',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedRapportRoute = AuthenticatedRapportRouteImport.update({
+  id: '/rapport',
+  path: '/rapport',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedReflektionRoute = AuthenticatedReflektionRouteImport.update({
   id: '/reflektion',
   path: '/reflektion',
@@ -57,6 +63,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/mal': typeof AuthenticatedMalRoute
+  '/rapport': typeof AuthenticatedRapportRoute
   '/reflektion': typeof AuthenticatedReflektionRoute
   '/tidslinje': typeof AuthenticatedTidslinjeRoute
 }
@@ -64,6 +71,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/mal': typeof AuthenticatedMalRoute
+  '/rapport': typeof AuthenticatedRapportRoute
   '/reflektion': typeof AuthenticatedReflektionRoute
   '/tidslinje': typeof AuthenticatedTidslinjeRoute
   '/': typeof AuthenticatedIndexRoute
@@ -74,6 +82,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/mal': typeof AuthenticatedMalRoute
+  '/_authenticated/rapport': typeof AuthenticatedRapportRoute
   '/_authenticated/reflektion': typeof AuthenticatedReflektionRoute
   '/_authenticated/tidslinje': typeof AuthenticatedTidslinjeRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
@@ -81,15 +90,29 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/auth' | '/reset-password' | '/mal' | '/reflektion' | '/tidslinje'
+    | '/'
+    | '/auth'
+    | '/reset-password'
+    | '/mal'
+    | '/rapport'
+    | '/reflektion'
+    | '/tidslinje'
   fileRoutesByTo: FileRoutesByTo
-  to: '/auth' | '/reset-password' | '/mal' | '/reflektion' | '/tidslinje' | '/'
+  to:
+    | '/auth'
+    | '/reset-password'
+    | '/mal'
+    | '/rapport'
+    | '/reflektion'
+    | '/tidslinje'
+    | '/'
   id:
     | '__root__'
     | '/_authenticated'
     | '/auth'
     | '/reset-password'
     | '/_authenticated/mal'
+    | '/_authenticated/rapport'
     | '/_authenticated/reflektion'
     | '/_authenticated/tidslinje'
     | '/_authenticated/'
@@ -138,6 +161,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMalRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/rapport': {
+      id: '/_authenticated/rapport'
+      path: '/rapport'
+      fullPath: '/rapport'
+      preLoaderRoute: typeof AuthenticatedRapportRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/reflektion': {
       id: '/_authenticated/reflektion'
       path: '/reflektion'
@@ -157,6 +187,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedMalRoute: typeof AuthenticatedMalRoute
+  AuthenticatedRapportRoute: typeof AuthenticatedRapportRoute
   AuthenticatedReflektionRoute: typeof AuthenticatedReflektionRoute
   AuthenticatedTidslinjeRoute: typeof AuthenticatedTidslinjeRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
@@ -164,6 +195,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMalRoute: AuthenticatedMalRoute,
+  AuthenticatedRapportRoute: AuthenticatedRapportRoute,
   AuthenticatedReflektionRoute: AuthenticatedReflektionRoute,
   AuthenticatedTidslinjeRoute: AuthenticatedTidslinjeRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
