@@ -41,7 +41,7 @@ function Report() {
     <>
       <div className="print:hidden">
         <PageHeader title="Exportera" sub="Välj innehåll och spara som PDF via utskriftsdialogen.">
-          <button className={btnPrimary} onClick={() => window.print()}><Printer size={16} /> Skriv ut / Spara som PDF</button>
+          <button className={btnPrimary} onClick={() => { const d = document.documentElement; const was = d.classList.contains("dark"); d.classList.remove("dark"); window.print(); if (was) d.classList.add("dark"); }}><Printer size={16} /> Skriv ut / Spara som PDF</button>
         </PageHeader>
         <div className="mb-6 flex flex-wrap gap-5 rounded-xl border bg-card p-4">
           {toggle("goals", "Mål & delmål")}{toggle("events", "Händelser")}{toggle("refl", "Reflektioner")}
