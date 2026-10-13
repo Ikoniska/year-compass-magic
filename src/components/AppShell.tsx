@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, type ReactNode } from "react";
 import { LayoutGrid, Target, GanttChart, NotebookPen, Printer, Moon, Sun, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import logo from "@/assets/ikoniska-logo.png.asset.json";
 
 const NAV = [
   { to: "/oversikt", label: "Översikt", icon: LayoutGrid },
@@ -38,10 +39,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen md:flex">
       <aside className="hidden w-60 shrink-0 flex-col border-r bg-sidebar p-4 md:flex md:sticky md:top-0 md:h-screen">
-        <div className="mb-8 flex items-center gap-2 px-2">
-          <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary font-display text-sm font-bold text-primary-foreground">Å</div>
-          <span className="font-display text-lg font-semibold">Årsplan</span>
-        </div>
+        <Link to="/oversikt" className="mb-8 block px-2">
+          <img src={logo.url} alt="Ikoniska" className="h-9 w-auto" />
+        </Link>
         <nav className="space-y-1">
           {NAV.map(({ to, label, icon: Icon }) => (
             <Link key={to} to={to} activeOptions={{ exact: true }}
@@ -60,7 +60,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </aside>
       <header className="sticky top-0 z-30 flex items-center justify-between border-b bg-background/85 px-4 py-3 backdrop-blur md:hidden">
-        <span className="font-display text-lg font-semibold">Årsplan</span>
+        <img src={logo.url} alt="Ikoniska" className="h-8 w-auto" />
         <div className="flex items-center gap-2">
           <button aria-label="Logga ut" onClick={signOut} className="rounded-lg border bg-card p-2 text-muted-foreground hover:text-foreground"><LogOut size={16} /></button>
           <ThemeToggle />
