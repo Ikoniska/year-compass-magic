@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, CalendarRange, LayoutGrid, Sparkles } from "lucide-react";
 import preview from "@/assets/app-preview.jpg";
 import { btnGhost, btnPrimary } from "@/components/Dialogs";
+import logo from "@/assets/ikoniska-logo.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -27,9 +28,8 @@ function Landing() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-5 py-5">
-        <Link to="/" className="flex items-center gap-2 font-display text-lg font-semibold">
-          <span className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-primary text-primary-foreground">Å</span>
-          Årsplan
+        <Link to="/" aria-label="Ikoniska – startsida">
+          <img src={logo.url} alt="Ikoniska" className="h-10 w-auto" />
         </Link>
         <nav className="flex items-center gap-2">
           <Link to="/auth" className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground">Logga in</Link>
