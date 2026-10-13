@@ -100,7 +100,7 @@ function Report() {
             <ul className="divide-y text-sm">
               {[...events].sort((a, b) => a.month - b.month || a.day - b.day).map((e) => (
                 <li key={e.id} className="flex items-center gap-3 py-2">
-                  <span className="w-24 shrink-0 text-muted-foreground">{e.day} {MONTHS[e.month].toLowerCase()}</span>
+                  <span className="w-24 shrink-0 text-muted-foreground">{e.day} {MONTHS[e.month]?.toLowerCase()}</span>
                   <span className={`h-2 w-2 rounded-full ${cat(e.category).dot}`} />{e.title}
                 </li>
               ))}
@@ -115,7 +115,7 @@ function Report() {
               {reflKeys.map(({ key, label }) => (
                 <div key={key} className="break-inside-avoid">
                   <h3 className="mb-1 font-semibold">{label}</h3>
-                  {Object.entries(reflections[key]).filter(([, v]) => v?.trim()).map(([q, v]) => (
+                  {Object.entries(reflections[key] ?? {}).filter(([, v]) => v?.trim()).map(([q, v]) => (
                     <p key={q} className="text-sm"><span className="text-muted-foreground">{QUESTIONS[q] ?? q}: </span>{v}</p>
                   ))}
                 </div>
