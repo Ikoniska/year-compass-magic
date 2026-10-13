@@ -26,9 +26,9 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => { if (data.user) navigate({ to: "/", replace: true }); });
+    supabase.auth.getUser().then(({ data }) => { if (data.user) navigate({ to: "/oversikt", replace: true }); });
     const { data } = supabase.auth.onAuthStateChange((e, s) => {
-      if (e === "SIGNED_IN" && s) navigate({ to: "/", replace: true });
+      if (e === "SIGNED_IN" && s) navigate({ to: "/oversikt", replace: true });
     });
     return () => data.subscription.unsubscribe();
   }, [navigate]);

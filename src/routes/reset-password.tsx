@@ -26,7 +26,7 @@ function ResetPage() {
     setBusy(false);
     if (error) { toast.error(error.message); return; }
     toast.success("Lösenordet är uppdaterat");
-    navigate({ to: "/", replace: true });
+    navigate({ to: "/oversikt", replace: true });
   }
   return (
     <div className="grid min-h-screen place-items-center bg-background px-4">

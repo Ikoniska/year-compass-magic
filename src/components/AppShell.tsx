@@ -5,7 +5,7 @@ import { LayoutGrid, Target, GanttChart, NotebookPen, Printer, Moon, Sun, LogOut
 import { supabase } from "@/integrations/supabase/client";
 
 const NAV = [
-  { to: "/", label: "Översikt", icon: LayoutGrid },
+  { to: "/oversikt", label: "Översikt", icon: LayoutGrid },
   { to: "/mal", label: "Mål", icon: Target },
   { to: "/tidslinje", label: "Tidslinje", icon: GanttChart },
   { to: "/reflektion", label: "Reflektion", icon: NotebookPen },
