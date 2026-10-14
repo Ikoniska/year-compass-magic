@@ -8,9 +8,9 @@ import { CATEGORIES, MONTHS_SHORT, STATUSES, cat, goalProgress, statusLabel, use
 export const Route = createFileRoute("/_authenticated/mal")({
   head: () => ({
     meta: [
-      { title: "Mål – Årsplan" },
+      { title: "Mål – Ikoniska" },
       { name: "description", content: "Skapa mål per kategori, sätt status och bocka av delmål." },
-      { property: "og:title", content: "Mål – Årsplan" },
+      { property: "og:title", content: "Mål – Ikoniska" },
       { property: "og:description", content: "Skapa mål per kategori, sätt status och bocka av delmål." },
     ],
   }),

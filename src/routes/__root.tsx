@@ -80,7 +80,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Årsplan – planera ditt år" },
+      { title: "Ikoniska – planera ditt år" },
       { name: "description", content: "Sätt mål, följ framsteg och reflektera över hela året." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

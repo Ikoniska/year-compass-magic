@@ -6,10 +6,10 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
     meta: [
-      { title: "Nytt lösenord – Årsplan" },
-      { name: "description", content: "Välj ett nytt lösenord för ditt Årsplan-konto." },
-      { property: "og:title", content: "Nytt lösenord – Årsplan" },
-      { property: "og:description", content: "Välj ett nytt lösenord för ditt Årsplan-konto." },
+      { title: "Nytt lösenord – Ikoniska" },
+      { name: "description", content: "Välj ett nytt lösenord för ditt Ikoniska-konto." },
+      { property: "og:title", content: "Nytt lösenord – Ikoniska" },
+      { property: "og:description", content: "Välj ett nytt lösenord för ditt Ikoniska-konto." },
     ],
   }),
   component: ResetPage,

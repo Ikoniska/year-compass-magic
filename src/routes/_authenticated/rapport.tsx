@@ -4,13 +4,14 @@ import { Printer } from "lucide-react";
 import { PageHeader } from "@/components/AppShell";
 import { btnPrimary } from "@/components/Dialogs";
 import { CATEGORIES, MONTHS, cat, goalProgress, statusLabel, usePlanner } from "@/lib/planner";
+import logo from "@/assets/ikoniska-logo.png.asset.json";
 
 export const Route = createFileRoute("/_authenticated/rapport")({
   head: () => ({
     meta: [
-      { title: "Exportera årsplan – Årsplan" },
+      { title: "Exportera årsplan – Ikoniska" },
       { name: "description", content: "Skriv ut eller spara din årsplan som PDF." },
-      { property: "og:title", content: "Exportera årsplan – Årsplan" },
+      { property: "og:title", content: "Exportera årsplan – Ikoniska" },
       { property: "og:description", content: "Skriv ut eller spara din årsplan som PDF." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -51,7 +52,8 @@ function Report() {
 
       <article id="print-report" className="rounded-xl border bg-card p-6 md:p-10 print:rounded-none print:border-0 print:p-0">
         <header className="mb-8 border-b pb-6">
-          <h1 className="font-display text-3xl font-semibold">Årsplan {year}</h1>
+          <img src={logo.url} alt="Ikoniska" className="logo-img mb-4 h-10 w-auto" />
+          <h1 className="font-display text-3xl font-semibold">Ikoniska årsplan {year}</h1>
           <p className="mt-1 text-sm text-muted-foreground">Exporterad {new Date().toLocaleDateString("sv-SE")}</p>
           <div className="mt-4 flex flex-wrap gap-6 text-sm">
             <span><b>{goals.length}</b> mål</span><span><b>{done}</b> slutförda</span><span><b>{avg}%</b> snittframsteg</span><span><b>{events.length}</b> händelser</span>

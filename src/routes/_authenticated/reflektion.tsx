@@ -6,9 +6,9 @@ import { MONTHS, usePlanner } from "@/lib/planner";
 export const Route = createFileRoute("/_authenticated/reflektion")({
   head: () => ({
     meta: [
-      { title: "Reflektion – Årsplan" },
+      { title: "Reflektion – Ikoniska" },
       { name: "description", content: "Reflektera över varje månad och kvartal med färdiga frågor." },
-      { property: "og:title", content: "Reflektion – Årsplan" },
+      { property: "og:title", content: "Reflektion – Ikoniska" },
       { property: "og:description", content: "Reflektera över varje månad och kvartal med färdiga frågor." },
     ],
   }),
