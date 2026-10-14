@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, CalendarRange, LayoutGrid, Sparkles } from "lucide-react";
 import preview from "@/assets/app-preview.jpg";
 import { btnGhost, btnPrimary } from "@/components/Dialogs";
-import logo from "@/assets/ikoniska-logo.png.asset.json";
+const logo = { url: "/ikoniska-logo.webp" };
 
 export const Route = createFileRoute("/")({
   head: () => ({

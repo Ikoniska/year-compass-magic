@@ -3,7 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, type ReactNode } from "react";
 import { LayoutGrid, Target, GanttChart, NotebookPen, Printer, Moon, Sun, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import logo from "@/assets/ikoniska-logo.png.asset.json";
+const logo = { url: "/ikoniska-logo.webp" };
 
 const NAV = [
   { to: "/oversikt", label: "Översikt", icon: LayoutGrid },

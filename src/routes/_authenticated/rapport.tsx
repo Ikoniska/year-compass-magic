@@ -4,7 +4,7 @@ import { Printer } from "lucide-react";
 import { PageHeader } from "@/components/AppShell";
 import { btnPrimary } from "@/components/Dialogs";
 import { CATEGORIES, MONTHS, cat, goalProgress, statusLabel, usePlanner } from "@/lib/planner";
-import logo from "@/assets/ikoniska-logo.png.asset.json";
+const logo = { url: "/ikoniska-logo.webp" };
 
 export const Route = createFileRoute("/_authenticated/rapport")({
   head: () => ({

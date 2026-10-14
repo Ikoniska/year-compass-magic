@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
-import logo from "@/assets/ikoniska-logo.png.asset.json";
+const logo = { url: "/ikoniska-logo.webp" };
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
