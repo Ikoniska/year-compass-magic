@@ -10,7 +10,7 @@ export const suggestMilestones = createServerFn({ method: "POST" })
     return { ...d, existing: (d.existing ?? []).slice(0, 30) };
   })
   .handler(async ({ data }) => {
-    const key = process.env.LOVABLE_API_KEY;
+    const key = process.env['LOVABLE_API_KEY'];
     if (!key) throw new Error("AI är inte konfigurerat.");
     const prompt = `Mål: "${data.title}" (kategori: ${data.category}). Tidsram: ${MONTHS[data.start]} till ${MONTHS[data.end]}.
 ${data.existing.length ? `Befintliga delmål (upprepa inte): ${data.existing.join("; ")}` : ""}
