@@ -7,9 +7,9 @@ import { lovable } from "@/integrations/lovable/index";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Logga in – Årsplan" },
-      { name: "description", content: "Logga in eller skapa ett konto för att planera ditt år med Årsplan." },
-      { property: "og:title", content: "Logga in – Årsplan" },
+      { title: "Logga in – Ikoniska" },
+      { name: "description", content: "Logga in eller skapa ett konto för att planera ditt år med Ikoniska." },
+      { property: "og:title", content: "Logga in – Ikoniska" },
       { property: "og:description", content: "Logga in eller skapa ett konto för att planera ditt år." },
     ],
   }),

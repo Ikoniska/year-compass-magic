@@ -9,9 +9,9 @@ import { MONTHS, cat, goalProgress, usePlanner } from "@/lib/planner";
 export const Route = createFileRoute("/_authenticated/oversikt")({
   head: () => ({
     meta: [
-      { title: "Översikt – Årsplan" },
+      { title: "Översikt – Ikoniska" },
       { name: "description", content: "Se hela ditt år, kvartal för kvartal, och följ dina mål." },
-      { property: "og:title", content: "Översikt – Årsplan" },
+      { property: "og:title", content: "Översikt – Ikoniska" },
       { property: "og:description", content: "Se hela ditt år, kvartal för kvartal, och följ dina mål." },
     ],
   }),

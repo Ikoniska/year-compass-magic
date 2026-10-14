@@ -8,9 +8,9 @@ import { MONTHS_SHORT, cat, goalProgress, usePlanner, type Goal, type PlanEvent 
 export const Route = createFileRoute("/_authenticated/tidslinje")({
   head: () => ({
     meta: [
-      { title: "Tidslinje – Årsplan" },
+      { title: "Tidslinje – Ikoniska" },
       { name: "description", content: "Gantt-vy över årets projekt och deadlines. Dra för att boka om." },
-      { property: "og:title", content: "Tidslinje – Årsplan" },
+      { property: "og:title", content: "Tidslinje – Ikoniska" },
       { property: "og:description", content: "Gantt-vy över årets projekt och deadlines. Dra för att boka om." },
     ],
   }),

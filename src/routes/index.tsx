@@ -7,9 +7,9 @@ import logo from "@/assets/ikoniska-logo.png.asset.json";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Årsplan – hela årets planer i en tydlig överblick" },
+      { title: "Ikoniska – hela årets planer i en tydlig överblick" },
       { name: "description", content: "Sätt mål, planera kvartal för kvartal och reflektera över ditt år – samlat på ett ställe." },
-      { property: "og:title", content: "Årsplan – hela årets planer i en tydlig överblick" },
+      { property: "og:title", content: "Ikoniska – hela årets planer i en tydlig överblick" },
       { property: "og:description", content: "Sätt mål, planera kvartal för kvartal och reflektera över ditt år – samlat på ett ställe." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -53,7 +53,7 @@ function Landing() {
 
       <section id="exempel" className="mx-auto max-w-6xl scroll-mt-8 px-5">
         <div className="overflow-hidden rounded-2xl border bg-card p-2 shadow-soft">
-          <img src={preview} alt="Årsplan visar årets tolv månader indelade i kvartal med färgkodade mål" className="w-full rounded-xl" width={1600} height={1000} />
+          <img src={preview} alt="Ikoniska visar årets tolv månader indelade i kvartal med färgkodade mål" className="w-full rounded-xl" width={1600} height={1000} />
         </div>
       </section>
 
@@ -73,7 +73,7 @@ function Landing() {
         <Link to="/auth" className={`${btnPrimary} mt-6 px-6 py-3 text-base`}>Kom igång <ArrowRight size={16} /></Link>
       </section>
 
-      <footer className="border-t py-6 text-center text-xs text-muted-foreground">© {new Date().getFullYear()} Årsplan</footer>
+      <footer className="border-t py-6 text-center text-xs text-muted-foreground">© {new Date().getFullYear()} Ikoniska</footer>
     </div>
   );
 }

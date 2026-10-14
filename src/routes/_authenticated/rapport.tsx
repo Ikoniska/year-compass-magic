@@ -8,9 +8,9 @@ import { CATEGORIES, MONTHS, cat, goalProgress, statusLabel, usePlanner } from "
 export const Route = createFileRoute("/_authenticated/rapport")({
   head: () => ({
     meta: [
-      { title: "Exportera årsplan – Årsplan" },
+      { title: "Exportera årsplan – Ikoniska" },
       { name: "description", content: "Skriv ut eller spara din årsplan som PDF." },
-      { property: "og:title", content: "Exportera årsplan – Årsplan" },
+      { property: "og:title", content: "Exportera årsplan – Ikoniska" },
       { property: "og:description", content: "Skriv ut eller spara din årsplan som PDF." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
