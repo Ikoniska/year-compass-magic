@@ -101,6 +101,27 @@ export type Database = {
         }
         Relationships: []
       }
+      weekly_focus: {
+        Row: {
+          items: Json
+          updated_at: string
+          user_id: string
+          week_key: string
+        }
+        Insert: {
+          items?: Json
+          updated_at?: string
+          user_id?: string
+          week_key: string
+        }
+        Update: {
+          items?: Json
+          updated_at?: string
+          user_id?: string
+          week_key?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

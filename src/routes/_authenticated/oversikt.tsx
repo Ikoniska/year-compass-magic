@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Plus, CalendarPlus, ArrowRight } from "lucide-react";
 import { PageHeader } from "@/components/AppShell";
+import { WeeklyFocus } from "@/components/WeeklyFocus";
 import { EventDialog, GoalDialog, btnGhost, btnPrimary } from "@/components/Dialogs";
 import { MONTHS, cat, goalProgress, usePlanner } from "@/lib/planner";
 
@@ -51,6 +52,8 @@ function Dashboard() {
           <Stat label="Händelser" value={events.length} />
         </div>
       </section>
+
+      <WeeklyFocus />
 
       <div className="space-y-8">
         {[0, 1, 2, 3].map((q) => (
