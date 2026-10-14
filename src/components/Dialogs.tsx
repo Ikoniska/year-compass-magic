@@ -1,5 +1,8 @@
 import { useState, type ReactNode } from "react";
-import { X, Plus, Trash2 } from "lucide-react";
+import { X, Plus, Trash2, Sparkles, Loader2 } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
+import { suggestMilestones } from "@/lib/ai.functions";
 import { CATEGORIES, MONTHS, STATUSES, usePlanner, type Goal, type PlanEvent } from "@/lib/planner";
 
 export function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
@@ -25,7 +28,19 @@ export function GoalDialog({ goal, onClose }: { goal?: Goal | undefined; onClose
   const { saveGoal, deleteGoal, newId } = usePlanner();
   const [g, setG] = useState<Goal>(goal ?? { id: newId(), title: "", category: "arbete", status: "ej", start: new Date().getMonth(), end: Math.min(11, new Date().getMonth() + 2), milestones: [] });
   const [ms, setMs] = useState("");
+  const [ai, setAi] = useState(false);
+  const suggest = useServerFn(suggestMilestones);
   const set = (p: Partial<Goal>) => setG((x) => ({ ...x, ...p }));
+  const runAi = async () => {
+    setAi(true);
+    try {
+      const r = await suggest({ data: { title: g.title, category: g.category, start: g.start, end: Math.max(g.start, g.end), existing: g.milestones.map((m) => m.title) } });
+      setG((x) => ({ ...x, milestones: [...x.milestones, ...r.milestones.map((t) => ({ id: newId(), title: t, done: false }))] }));
+      toast.success(`${r.milestones.length} delmål föreslagna – redigera fritt.`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "AI kunde inte skapa förslag.");
+    } finally { setAi(false); }
+  };
 
   return (
     <Modal title={goal ? "Redigera mål" : "Nytt mål"} onClose={onClose}>
@@ -54,7 +69,13 @@ export function GoalDialog({ goal, onClose }: { goal?: Goal | undefined; onClose
           <div><label className={label}>Deadline</label><select className={field} value={g.end} onChange={(e) => set({ end: +e.target.value })}>{MONTHS.map((m, i) => <option key={m} value={i}>{m}</option>)}</select></div>
         </div>
         <div>
-          <label className={label}>Delmål</label>
+          <div className="mb-1.5 flex items-center justify-between">
+            <label className={`${label} mb-0`}>Delmål</label>
+            <button type="button" disabled={ai || !g.title.trim()} onClick={runAi}
+              className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary transition hover:bg-primary/20 disabled:opacity-50">
+              {ai ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />} {ai ? "Tänker…" : "Föreslå med AI"}
+            </button>
+          </div>
           <ul className="mb-2 space-y-1.5">
             {g.milestones.map((m) => (
               <li key={m.id} className="flex items-center gap-2 text-sm">
