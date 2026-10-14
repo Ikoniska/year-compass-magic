@@ -40,7 +40,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="min-h-screen md:flex">
       <aside className="hidden w-60 shrink-0 flex-col border-r bg-sidebar p-4 md:flex md:sticky md:top-0 md:h-screen">
         <Link to="/oversikt" className="mb-8 block px-2">
-          <img src={logo.url} alt="Ikoniska" className="h-9 w-auto" />
+          <img src={logo.url} alt="Ikoniska" className="logo-img h-9 w-auto" />
         </Link>
         <nav className="space-y-1">
           {NAV.map(({ to, label, icon: Icon }) => (
@@ -60,7 +60,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </aside>
       <header className="sticky top-0 z-30 flex items-center justify-between border-b bg-background/85 px-4 py-3 backdrop-blur md:hidden">
-        <img src={logo.url} alt="Ikoniska" className="h-8 w-auto" />
+        <img src={logo.url} alt="Ikoniska" className="logo-img h-8 w-auto" />
         <div className="flex items-center gap-2">
           <button aria-label="Logga ut" onClick={signOut} className="rounded-lg border bg-card p-2 text-muted-foreground hover:text-foreground"><LogOut size={16} /></button>
           <ThemeToggle />

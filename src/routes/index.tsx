@@ -29,7 +29,7 @@ function Landing() {
     <div className="min-h-screen bg-background text-foreground">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-5 py-5">
         <Link to="/" aria-label="Ikoniska – startsida">
-          <img src={logo.url} alt="Ikoniska" className="h-10 w-auto" />
+          <img src={logo.url} alt="Ikoniska" className="logo-img h-10 w-auto" />
         </Link>
         <nav className="flex items-center gap-2">
           <Link to="/auth" className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground">Logga in</Link>

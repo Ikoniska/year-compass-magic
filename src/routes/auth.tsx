@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
+import logo from "@/assets/ikoniska-logo.png.asset.json";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -65,8 +66,7 @@ function AuthPage() {
     <div className="grid min-h-screen place-items-center bg-background px-4">
       <div className="w-full max-w-sm rounded-2xl border bg-card p-8 shadow-sm">
         <div className="mb-6 flex items-center gap-2">
-          <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary font-display text-sm font-bold text-primary-foreground">Å</div>
-          <span className="font-display text-lg font-semibold">Årsplan</span>
+          <img src={logo.url} alt="Ikoniska" className="logo-img h-9 w-auto" />
         </div>
         <h1 className="font-display text-2xl font-semibold">{title}</h1>
         {mode !== "forgot" && (
