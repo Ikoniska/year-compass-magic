@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Plus, CalendarPlus, ArrowRight } from "lucide-react";
 import { PageHeader } from "@/components/AppShell";
 import { WeeklyFocus } from "@/components/WeeklyFocus";
+import { HabitTracker } from "@/components/HabitTracker";
 import { EventDialog, GoalDialog, btnGhost, btnPrimary } from "@/components/Dialogs";
 import { MONTHS, cat, goalProgress, usePlanner } from "@/lib/planner";
 
@@ -54,6 +55,7 @@ function Dashboard() {
       </section>
 
       <WeeklyFocus />
+      <HabitTracker />
 
       <div className="space-y-8">
         {[0, 1, 2, 3].map((q) => (

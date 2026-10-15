@@ -29,6 +29,7 @@ export interface Milestone { id: string; title: string; done: boolean }
 export interface Goal {
   id: string; title: string; category: Category; status: Status;
   start: number; end: number; milestones: Milestone[];
+  habit?: string; habitTarget?: number;
 }
 export interface PlanEvent { id: string; title: string; month: number; day: number; category: Category }
 export type Reflections = Record<string, Record<string, string>>;
@@ -63,6 +64,7 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
       setGoals((g.data ?? []).map((x) => ({
         id: x.id, title: x.title, category: x.category as Category, status: x.status as Status,
         start: x.start_month, end: x.end_month, milestones: (x.milestones as unknown as Milestone[]) ?? [],
+        habit: x.habit ?? "", habitTarget: x.habit_target ?? 0,
       })));
       setEvents((e.data ?? []).map((x) => ({ id: x.id, title: x.title, month: x.month, day: x.day, category: x.category as Category })));
       setRefl(Object.fromEntries((r.data ?? []).map((x) => [x.period_key, x.answers as Record<string, string>])));
@@ -78,6 +80,7 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
     supabase.from("goals").upsert({
       id: g.id, title: g.title, category: g.category, status: g.status,
       start_month: g.start, end_month: g.end, milestones: g.milestones as never,
+      habit: g.habit ?? "", habit_target: g.habitTarget ?? 0,
     }).then(({ error }) => fail(error));
   };
   const deleteGoal = (id: string) => {

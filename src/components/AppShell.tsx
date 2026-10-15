@@ -1,7 +1,7 @@
 import { Link, useNavigate, useRouteContext } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, type ReactNode } from "react";
-import { LayoutGrid, Target, GanttChart, NotebookPen, StickyNote, Printer, Moon, Sun, LogOut } from "lucide-react";
+import { LayoutGrid, Target, GanttChart, NotebookPen, StickyNote, Printer, Award, Moon, Sun, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 const logo = { url: "/ikoniska-logo.webp" };
 
@@ -11,6 +11,7 @@ const NAV = [
   { to: "/tidslinje", label: "Tidslinje", icon: GanttChart },
   { to: "/reflektion", label: "Reflektion", icon: NotebookPen },
   { to: "/whiteboard", label: "Whiteboard", icon: StickyNote },
+  { to: "/arsbokslut", label: "Årsbokslut", icon: Award },
   { to: "/rapport", label: "Exportera", icon: Printer },
 ] as const;
 
@@ -68,7 +69,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </header>
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-24 pt-6 md:px-10 md:pb-10 md:pt-10">{children}</main>
-      <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-6 border-t bg-background/95 backdrop-blur md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-7 border-t bg-background/95 backdrop-blur md:hidden">
         {NAV.map(({ to, label, icon: Icon }) => (
           <Link key={to} to={to} activeOptions={{ exact: true }} className="flex flex-col items-center gap-1 py-2.5 text-[11px] text-muted-foreground"
             activeProps={{ className: "text-primary" }}>

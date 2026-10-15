@@ -69,6 +69,15 @@ export function GoalDialog({ goal, onClose }: { goal?: Goal | undefined; onClose
           <div><label className={label}>Deadline</label><select className={field} value={g.end} onChange={(e) => set({ end: +e.target.value })}>{MONTHS.map((m, i) => <option key={m} value={i}>{m}</option>)}</select></div>
         </div>
         <div>
+          <label className={label}>Mikrovana (valfritt)</label>
+          <div className="flex gap-2">
+            <input className={field} value={g.habit ?? ""} onChange={(e) => set({ habit: e.target.value, habitTarget: g.habitTarget || (e.target.value ? 3 : 0) })} placeholder="T.ex. Skriv 30 minuter" />
+            <select className={`${field} w-32`} value={g.habitTarget ?? 0} onChange={(e) => set({ habitTarget: +e.target.value })}>
+              {[0, 1, 2, 3, 4, 5, 6, 7].map((n) => <option key={n} value={n}>{n ? `${n} dgr/v` : "Ingen"}</option>)}
+            </select>
+          </div>
+        </div>
+        <div>
           <div className="mb-1.5 flex items-center justify-between">
             <label className={`${label} mb-0`}>Delmål</label>
             <button type="button" disabled={ai || !g.title.trim()} onClick={runAi}

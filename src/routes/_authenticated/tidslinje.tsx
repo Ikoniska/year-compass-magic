@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { ChevronLeft, ChevronRight, CalendarPlus } from "lucide-react";
 import { PageHeader } from "@/components/AppShell";
+import { EnergyPlanner } from "@/components/EnergyPlanner";
 import { EventDialog, GoalDialog, btnGhost } from "@/components/Dialogs";
 import { MONTHS_SHORT, cat, goalProgress, usePlanner, type Goal, type PlanEvent } from "@/lib/planner";
 
@@ -50,6 +51,8 @@ function Timeline() {
       <PageHeader title="Tidslinje" sub="Dra staplar eller händelser till en ny månad – eller använd pilarna.">
         <button className={btnGhost} onClick={() => setEditE("new")}><CalendarPlus size={15} /> Händelse</button>
       </PageHeader>
+
+      <EnergyPlanner />
 
       <div className="overflow-x-auto rounded-2xl border bg-card">
         <div className="min-w-[860px]">

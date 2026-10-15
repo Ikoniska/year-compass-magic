@@ -49,6 +49,8 @@ export type Database = {
           category: string
           created_at: string
           end_month: number
+          habit: string
+          habit_target: number
           id: string
           milestones: Json
           start_month: number
@@ -60,6 +62,8 @@ export type Database = {
           category: string
           created_at?: string
           end_month?: number
+          habit?: string
+          habit_target?: number
           id?: string
           milestones?: Json
           start_month?: number
@@ -71,12 +75,53 @@ export type Database = {
           category?: string
           created_at?: string
           end_month?: number
+          habit?: string
+          habit_target?: number
           id?: string
           milestones?: Json
           start_month?: number
           status?: string
           title?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      habit_logs: {
+        Row: {
+          day: string
+          goal_id: string
+          user_id: string
+        }
+        Insert: {
+          day: string
+          goal_id: string
+          user_id?: string
+        }
+        Update: {
+          day?: string
+          goal_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      quarter_energy: {
+        Row: {
+          level: string
+          quarter: number
+          user_id: string
+          year: number
+        }
+        Insert: {
+          level?: string
+          quarter: number
+          user_id?: string
+          year: number
+        }
+        Update: {
+          level?: string
+          quarter?: number
+          user_id?: string
+          year?: number
         }
         Relationships: []
       }
@@ -155,6 +200,27 @@ export type Database = {
           rotation?: number
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      year_reviews: {
+        Row: {
+          content: Json
+          created_at: string
+          user_id: string
+          year: number
+        }
+        Insert: {
+          content?: Json
+          created_at?: string
+          user_id?: string
+          year: number
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          user_id?: string
+          year?: number
         }
         Relationships: []
       }
