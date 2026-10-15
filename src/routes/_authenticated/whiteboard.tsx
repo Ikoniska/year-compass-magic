@@ -34,7 +34,7 @@ function Whiteboard() {
   }, []);
 
   async function save(id: string, patch: Partial<Note>) {
-    const { error } = await supabase.from("whiteboard_notes").update({ ...patch, updated_at: new Date().toISOString() }).eq("id", id);
+    const { error } = await supabase.from("whiteboard_notes").update({ ...(patch as Record<string, string | number>), updated_at: new Date().toISOString() }).eq("id", id);
     if (error) toast.error("Kunde inte spara");
   }
   function update(id: string, patch: Partial<Note>, debounce = false) {
@@ -44,7 +44,7 @@ function Whiteboard() {
     timers.current[id] = setTimeout(() => save(id, patch), 500);
   }
   async function add(x = 40 + Math.random() * 200, y = 40 + Math.random() * 120) {
-    const row = { content: "", color: COLORS[Math.floor(Math.random() * COLORS.length)], pos_x: x, pos_y: y, rotation: Math.round((Math.random() * 4 - 2) * 10) / 10 };
+    const row = { content: "", color: COLORS[Math.floor(Math.random() * COLORS.length)] ?? "yellow", pos_x: x, pos_y: y, rotation: Math.round((Math.random() * 4 - 2) * 10) / 10 };
     const { data, error } = await supabase.from("whiteboard_notes").insert(row).select("id,content,color,pos_x,pos_y,rotation").single();
     if (error || !data) return toast.error("Kunde inte skapa lapp");
     setNotes((n) => [...n, data]);
