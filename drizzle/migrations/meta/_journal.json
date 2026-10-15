@@ -22,6 +22,13 @@
       "when": 1792044809071,
       "tag": "0002_whiteboard_notes",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792050637252,
+      "tag": "0003_year_review_energy_habits",
+      "breakpoints": true
     }
   ]
 }
