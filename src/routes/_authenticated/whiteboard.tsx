@@ -39,14 +39,14 @@ function Whiteboard() {
   }
   function update(id: string, patch: Partial<Note>, debounce = false) {
     setNotes((n) => n.map((x) => (x.id === id ? { ...x, ...patch } : x)));
-    if (!debounce) return save(id, patch);
+    if (!debounce) { void save(id, patch); return; }
     clearTimeout(timers.current[id]);
     timers.current[id] = setTimeout(() => save(id, patch), 500);
   }
   async function add(x = 40 + Math.random() * 200, y = 40 + Math.random() * 120) {
     const row = { content: "", color: COLORS[Math.floor(Math.random() * COLORS.length)] ?? "yellow", pos_x: x, pos_y: y, rotation: Math.round((Math.random() * 4 - 2) * 10) / 10 };
     const { data, error } = await supabase.from("whiteboard_notes").insert(row).select("id,content,color,pos_x,pos_y,rotation").single();
-    if (error || !data) return toast.error("Kunde inte skapa lapp");
+    if (error || !data) { toast.error("Kunde inte skapa lapp"); return; }
     setNotes((n) => [...n, data]);
   }
   async function remove(id: string) {
