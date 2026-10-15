@@ -18,6 +18,7 @@ import { Route as AuthenticatedOversiktRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedRapportRouteImport } from './routes/_authenticated/rapport'
 import { Route as AuthenticatedReflektionRouteImport } from './routes/_authenticated/reflektion'
 import { Route as AuthenticatedTidslinjeRouteImport } from './routes/_authenticated/tidslinje'
+import { Route as AuthenticatedWhiteboardRouteImport } from './routes/_authenticated/whiteboard'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -63,6 +64,11 @@ const AuthenticatedTidslinjeRoute = AuthenticatedTidslinjeRouteImport.update({
   path: '/tidslinje',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedWhiteboardRoute = AuthenticatedWhiteboardRouteImport.update({
+  id: '/whiteboard',
+  path: '/whiteboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -73,6 +79,7 @@ export interface FileRoutesByFullPath {
   '/rapport': typeof AuthenticatedRapportRoute
   '/reflektion': typeof AuthenticatedReflektionRoute
   '/tidslinje': typeof AuthenticatedTidslinjeRoute
+  '/whiteboard': typeof AuthenticatedWhiteboardRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -83,6 +90,7 @@ export interface FileRoutesByTo {
   '/rapport': typeof AuthenticatedRapportRoute
   '/reflektion': typeof AuthenticatedReflektionRoute
   '/tidslinje': typeof AuthenticatedTidslinjeRoute
+  '/whiteboard': typeof AuthenticatedWhiteboardRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -95,6 +103,7 @@ export interface FileRoutesById {
   '/_authenticated/rapport': typeof AuthenticatedRapportRoute
   '/_authenticated/reflektion': typeof AuthenticatedReflektionRoute
   '/_authenticated/tidslinje': typeof AuthenticatedTidslinjeRoute
+  '/_authenticated/whiteboard': typeof AuthenticatedWhiteboardRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -107,6 +116,7 @@ export interface FileRouteTypes {
     | '/rapport'
     | '/reflektion'
     | '/tidslinje'
+    | '/whiteboard'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
     | '/rapport'
     | '/reflektion'
     | '/tidslinje'
+    | '/whiteboard'
   id:
     | '__root__'
     | '/'
@@ -128,6 +139,7 @@ export interface FileRouteTypes {
     | '/_authenticated/rapport'
     | '/_authenticated/reflektion'
     | '/_authenticated/tidslinje'
+    | '/_authenticated/whiteboard'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -202,6 +214,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTidslinjeRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/whiteboard': {
+      id: '/_authenticated/whiteboard'
+      path: '/whiteboard'
+      fullPath: '/whiteboard'
+      preLoaderRoute: typeof AuthenticatedWhiteboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -211,6 +230,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRapportRoute: typeof AuthenticatedRapportRoute
   AuthenticatedReflektionRoute: typeof AuthenticatedReflektionRoute
   AuthenticatedTidslinjeRoute: typeof AuthenticatedTidslinjeRoute
+  AuthenticatedWhiteboardRoute: typeof AuthenticatedWhiteboardRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -219,6 +239,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedRapportRoute: AuthenticatedRapportRoute,
   AuthenticatedReflektionRoute: AuthenticatedReflektionRoute,
   AuthenticatedTidslinjeRoute: AuthenticatedTidslinjeRoute,
+  AuthenticatedWhiteboardRoute: AuthenticatedWhiteboardRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
