@@ -21,7 +21,9 @@ function Goals() {
   const { goals, saveGoal } = usePlanner();
   const [filter, setFilter] = useState<Category | "alla">("alla");
   const [edit, setEdit] = useState<Goal | "new" | null>(null);
-  const list = goals.filter((g) => filter === "alla" || g.category === filter);
+  const list = goals
+    .filter((g) => filter === "alla" || g.category === filter)
+    .sort((a, b) => a.start - b.start || a.end - b.end || a.title.localeCompare(b.title, "sv"));
 
   return (
     <>
