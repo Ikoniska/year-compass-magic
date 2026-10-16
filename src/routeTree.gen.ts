@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthenticatedArsbokslutRouteImport } from './routes/_authenticated/arsbokslut'
 import { Route as AuthenticatedMalRouteImport } from './routes/_authenticated/mal'
 import { Route as AuthenticatedOversiktRouteImport } from './routes/_authenticated/oversikt'
 import { Route as AuthenticatedRapportRouteImport } from './routes/_authenticated/rapport'
@@ -38,6 +39,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedArsbokslutRoute = AuthenticatedArsbokslutRouteImport.update({
+  id: '/arsbokslut',
+  path: '/arsbokslut',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedMalRoute = AuthenticatedMalRouteImport.update({
   id: '/mal',
@@ -74,6 +80,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/arsbokslut': typeof AuthenticatedArsbokslutRoute
   '/mal': typeof AuthenticatedMalRoute
   '/oversikt': typeof AuthenticatedOversiktRoute
   '/rapport': typeof AuthenticatedRapportRoute
@@ -85,6 +92,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/arsbokslut': typeof AuthenticatedArsbokslutRoute
   '/mal': typeof AuthenticatedMalRoute
   '/oversikt': typeof AuthenticatedOversiktRoute
   '/rapport': typeof AuthenticatedRapportRoute
@@ -98,6 +106,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/arsbokslut': typeof AuthenticatedArsbokslutRoute
   '/_authenticated/mal': typeof AuthenticatedMalRoute
   '/_authenticated/oversikt': typeof AuthenticatedOversiktRoute
   '/_authenticated/rapport': typeof AuthenticatedRapportRoute
@@ -111,6 +120,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/reset-password'
+    | '/arsbokslut'
     | '/mal'
     | '/oversikt'
     | '/rapport'
@@ -122,6 +132,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/reset-password'
+    | '/arsbokslut'
     | '/mal'
     | '/oversikt'
     | '/rapport'
@@ -134,6 +145,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/reset-password'
+    | '/_authenticated/arsbokslut'
     | '/_authenticated/mal'
     | '/_authenticated/oversikt'
     | '/_authenticated/rapport'
@@ -178,6 +190,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/arsbokslut': {
+      id: '/_authenticated/arsbokslut'
+      path: '/arsbokslut'
+      fullPath: '/arsbokslut'
+      preLoaderRoute: typeof AuthenticatedArsbokslutRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/mal': {
       id: '/_authenticated/mal'
@@ -225,6 +244,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedArsbokslutRoute: typeof AuthenticatedArsbokslutRoute
   AuthenticatedMalRoute: typeof AuthenticatedMalRoute
   AuthenticatedOversiktRoute: typeof AuthenticatedOversiktRoute
   AuthenticatedRapportRoute: typeof AuthenticatedRapportRoute
@@ -234,6 +254,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedArsbokslutRoute: AuthenticatedArsbokslutRoute,
   AuthenticatedMalRoute: AuthenticatedMalRoute,
   AuthenticatedOversiktRoute: AuthenticatedOversiktRoute,
   AuthenticatedRapportRoute: AuthenticatedRapportRoute,
