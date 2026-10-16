@@ -64,7 +64,7 @@ function Report() {
           <section className="mb-8">
             <h2 className="mb-4 font-display text-xl font-semibold">Mål per kvartal</h2>
             {[0, 1, 2, 3].map((q) => {
-              const list = goals.filter((g) => Math.floor(g.start / 3) === q);
+              const list = goals.filter((g) => Math.floor(g.start / 3) === q).sort((a, b) => a.start - b.start || a.end - b.end);
               if (!list.length) return null;
               return (
                 <div key={q} className="mb-6 break-inside-avoid">
