@@ -172,6 +172,7 @@ export type Database = {
           color: string
           content: string
           created_at: string
+          height: number
           id: string
           is_checklist: boolean
           items: Json
@@ -180,11 +181,13 @@ export type Database = {
           rotation: number
           updated_at: string
           user_id: string
+          width: number
         }
         Insert: {
           color?: string
           content?: string
           created_at?: string
+          height?: number
           id?: string
           is_checklist?: boolean
           items?: Json
@@ -193,11 +196,13 @@ export type Database = {
           rotation?: number
           updated_at?: string
           user_id?: string
+          width?: number
         }
         Update: {
           color?: string
           content?: string
           created_at?: string
+          height?: number
           id?: string
           is_checklist?: boolean
           items?: Json
@@ -205,6 +210,34 @@ export type Database = {
           pos_y?: number
           rotation?: number
           updated_at?: string
+          user_id?: string
+          width?: number
+        }
+        Relationships: []
+      }
+      whiteboard_strokes: {
+        Row: {
+          color: string
+          created_at: string
+          id: string
+          points: Json
+          size: number
+          user_id: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          id?: string
+          points?: Json
+          size?: number
+          user_id?: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          id?: string
+          points?: Json
+          size?: number
           user_id?: string
         }
         Relationships: []
