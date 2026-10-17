@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Target, ListChecks, X } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/AppShell";
+import { GoalDialog } from "@/components/Dialogs";
+import { usePlanner, type Goal } from "@/lib/planner";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/whiteboard")({
@@ -20,21 +22,42 @@ export const Route = createFileRoute("/_authenticated/whiteboard")({
 });
 
 const COLORS = ["yellow", "green", "pink", "blue", "purple"] as const;
-type Note = { id: string; content: string; color: string; pos_x: number; pos_y: number; rotation: number };
+type Item = { id: string; text: string; done: boolean };
+type Note = { id: string; content: string; color: string; pos_x: number; pos_y: number; rotation: number; items: Item[]; is_checklist: boolean };
+const FIELDS = "id,content,color,pos_x,pos_y,rotation,items,is_checklist";
+
+const LAYOUTS = {
+  fri: { label: "Fri canvas", zones: [] as string[] },
+  kvartal: { label: "Kvartal", zones: ["Q1", "Q2", "Q3", "Q4"] },
+  omraden: { label: "Livsområden", zones: ["Arbete & karriär", "Hälsa & energi", "Personlig utveckling", "Ekonomi & projekt"] },
+  kanban: { label: "Kanban", zones: ["Idébank", "Planeras", "Pågående", "Klart"] },
+};
+type LayoutKey = keyof typeof LAYOUTS;
+const BOARD_W = 1200;
 
 function Whiteboard() {
+  const { newId } = usePlanner();
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
+  const [layout, setLayout] = useState<LayoutKey>("fri");
+  const [goalDraft, setGoalDraft] = useState<Goal | null>(null);
   const boardRef = useRef<HTMLDivElement>(null);
   const timers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
   useEffect(() => {
-    supabase.from("whiteboard_notes").select("id,content,color,pos_x,pos_y,rotation").order("created_at")
-      .then(({ data, error }) => { if (error) toast.error("Kunde inte hämta lappar"); setNotes(data ?? []); setLoading(false); });
+    const saved = localStorage.getItem("wb-layout") as LayoutKey | null;
+    if (saved && saved in LAYOUTS) setLayout(saved);
+    supabase.from("whiteboard_notes").select(FIELDS).order("created_at")
+      .then(({ data, error }) => {
+        if (error) toast.error("Kunde inte hämta lappar");
+        setNotes((data ?? []).map((n) => ({ ...n, items: (n.items as Item[] | null) ?? [] })));
+        setLoading(false);
+      });
   }, []);
+  const pickLayout = (k: LayoutKey) => { setLayout(k); localStorage.setItem("wb-layout", k); };
 
   async function save(id: string, patch: Partial<Note>) {
-    const { error } = await supabase.from("whiteboard_notes").update({ ...(patch as Record<string, string | number>), updated_at: new Date().toISOString() }).eq("id", id);
+    const { error } = await supabase.from("whiteboard_notes").update({ ...patch, updated_at: new Date().toISOString() } as never).eq("id", id);
     if (error) toast.error("Kunde inte spara");
   }
   function update(id: string, patch: Partial<Note>, debounce = false) {
@@ -43,25 +66,33 @@ function Whiteboard() {
     clearTimeout(timers.current[id]);
     timers.current[id] = setTimeout(() => save(id, patch), 500);
   }
-  async function add(x = 40 + Math.random() * 200, y = 40 + Math.random() * 120) {
+  async function add(x = 40 + Math.random() * 200, y = 60 + Math.random() * 120) {
     const row = { content: "", color: COLORS[Math.floor(Math.random() * COLORS.length)] ?? "yellow", pos_x: x, pos_y: y, rotation: Math.round((Math.random() * 4 - 2) * 10) / 10 };
-    const { data, error } = await supabase.from("whiteboard_notes").insert(row).select("id,content,color,pos_x,pos_y,rotation").single();
+    const { data, error } = await supabase.from("whiteboard_notes").insert(row).select(FIELDS).single();
     if (error || !data) { toast.error("Kunde inte skapa lapp"); return; }
-    setNotes((n) => [...n, data]);
+    setNotes((n) => [...n, { ...data, items: (data.items as Item[] | null) ?? [] }]);
   }
   async function remove(id: string) {
     setNotes((n) => n.filter((x) => x.id !== id));
     await supabase.from("whiteboard_notes").delete().eq("id", id);
   }
+  function toGoal(n: Note) {
+    const lines = n.content.split("\n").map((s) => s.trim()).filter(Boolean);
+    const m = new Date().getMonth();
+    setGoalDraft({
+      id: newId(), title: lines[0] ?? "Nytt mål", category: "arbete", status: "ej", start: m, end: Math.min(11, m + 2),
+      milestones: n.items.map((i) => ({ id: newId(), title: i.text, done: i.done })).filter((i) => i.title),
+    });
+  }
 
   function startDrag(e: React.PointerEvent, note: Note) {
-    if ((e.target as HTMLElement).closest("textarea,button")) return;
+    if ((e.target as HTMLElement).closest("textarea,button,input")) return;
     e.preventDefault();
     const sx = e.clientX, sy = e.clientY, ox = note.pos_x, oy = note.pos_y;
     let pos = { pos_x: ox, pos_y: oy };
     const move = (ev: PointerEvent) => {
       const b = boardRef.current!;
-      pos = { pos_x: Math.max(0, Math.min(b.clientWidth - 200, ox + ev.clientX - sx)), pos_y: Math.max(0, Math.min(b.clientHeight - 180, oy + ev.clientY - sy)) };
+      pos = { pos_x: Math.max(0, Math.min(b.clientWidth - 200, ox + ev.clientX - sx)), pos_y: Math.max(0, Math.min(b.clientHeight - 200, oy + ev.clientY - sy)) };
       setNotes((n) => n.map((x) => (x.id === note.id ? { ...x, ...pos } : x)));
     };
     const up = () => {
@@ -71,25 +102,65 @@ function Whiteboard() {
     window.addEventListener("pointermove", move); window.addEventListener("pointerup", up);
   }
 
+  const zones = LAYOUTS[layout].zones;
+  const setItems = (n: Note, items: Item[], debounce = false) => update(n.id, { items }, debounce);
+
   return (
     <>
       <PageHeader title="Whiteboard" sub="Din idébank och vision board. Dubbelklicka på tavlan för en ny lapp.">
-        <button onClick={() => add()} className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90">
-          <Plus size={16} /> Ny lapp
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex rounded-lg border p-0.5 text-sm">
+            {(Object.keys(LAYOUTS) as LayoutKey[]).map((k) => (
+              <button key={k} onClick={() => pickLayout(k)}
+                className={`rounded-md px-3 py-1.5 ${layout === k ? "bg-secondary font-medium text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+                {LAYOUTS[k].label}
+              </button>
+            ))}
+          </div>
+          <button onClick={() => add()} className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90">
+            <Plus size={16} /> Ny lapp
+          </button>
+        </div>
       </PageHeader>
       <div className="overflow-auto rounded-2xl border">
-        <div ref={boardRef} className="whiteboard-grid relative h-[900px] min-w-[900px]"
+        <div ref={boardRef} className="whiteboard-grid relative h-[900px]" style={{ minWidth: BOARD_W }}
           onDoubleClick={(e) => { if (e.target !== e.currentTarget) return; const r = e.currentTarget.getBoundingClientRect(); add(e.clientX - r.left - 100, e.clientY - r.top - 20); }}>
+          {zones.length > 0 && (
+            <div className="pointer-events-none absolute inset-0 grid" style={{ gridTemplateColumns: `repeat(${zones.length}, 1fr)` }}>
+              {zones.map((z, i) => (
+                <div key={z} className={`border-r border-dashed border-border/80 last:border-r-0 ${i % 2 ? "bg-muted/30" : ""}`}>
+                  <div className="m-3 inline-block rounded-full bg-background/80 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground shadow-sm">{z}</div>
+                </div>
+              ))}
+            </div>
+          )}
           {!loading && notes.length === 0 && (
             <p className="pointer-events-none absolute inset-0 grid place-items-center text-sm text-muted-foreground">Tomt här – klicka "Ny lapp" för att börja.</p>
           )}
           {notes.map((n) => (
             <div key={n.id} onPointerDown={(e) => startDrag(e, n)}
-              className={`note-${n.color} group absolute flex h-[180px] w-[200px] cursor-grab touch-none flex-col rounded-md p-3 shadow-lg active:cursor-grabbing`}
+              className={`note-${n.color} group absolute flex min-h-[180px] w-[200px] cursor-grab touch-none flex-col rounded-md p-3 shadow-lg active:cursor-grabbing`}
               style={{ left: n.pos_x, top: n.pos_y, transform: `rotate(${n.rotation}deg)` }}>
-              <textarea value={n.content} placeholder="Skriv en idé…" onChange={(e) => update(n.id, { content: e.target.value }, true)}
-                className="flex-1 resize-none bg-transparent text-sm leading-snug outline-none placeholder:opacity-50" />
+              {n.is_checklist ? (
+                <div className="flex flex-1 flex-col gap-1 text-sm">
+                  <input value={n.content} placeholder="Rubrik…" onChange={(e) => update(n.id, { content: e.target.value }, true)}
+                    className="bg-transparent font-semibold outline-none placeholder:opacity-50" />
+                  {n.items.map((it) => (
+                    <div key={it.id} className="flex items-center gap-1.5">
+                      <input type="checkbox" checked={it.done} aria-label="Klar"
+                        onChange={() => setItems(n, n.items.map((x) => (x.id === it.id ? { ...x, done: !x.done } : x)))} className="h-3.5 w-3.5 shrink-0 accent-current" />
+                      <input value={it.text} onChange={(e) => setItems(n, n.items.map((x) => (x.id === it.id ? { ...x, text: e.target.value } : x)), true)}
+                        className={`min-w-0 flex-1 bg-transparent outline-none ${it.done ? "line-through opacity-60" : ""}`} />
+                      <button aria-label="Ta bort punkt" onClick={() => setItems(n, n.items.filter((x) => x.id !== it.id))} className="opacity-0 group-hover:opacity-60"><X size={12} /></button>
+                    </div>
+                  ))}
+                  <input placeholder="+ Ny punkt (Enter)" className="bg-transparent text-xs outline-none placeholder:opacity-50"
+                    onKeyDown={(e) => { const t = e.currentTarget.value.trim(); if (e.key === "Enter" && t) { setItems(n, [...n.items, { id: newId(), text: t, done: false }]); e.currentTarget.value = ""; } }} />
+                </div>
+              ) : (
+                <textarea value={n.content} placeholder="Skriv en idé…" onChange={(e) => update(n.id, { content: e.target.value }, true)}
+                  className="min-h-[110px] flex-1 resize-none bg-transparent text-sm leading-snug outline-none placeholder:opacity-50" />
+              )}
               <div className="mt-2 flex items-center justify-between opacity-60 transition group-hover:opacity-100">
                 <div className="flex gap-1">
                   {COLORS.map((c) => (
@@ -97,12 +168,17 @@ function Whiteboard() {
                       className={`note-${c} h-4 w-4 rounded-full border border-current/30 ${n.color === c ? "ring-2 ring-current/50" : ""}`} />
                   ))}
                 </div>
-                <button aria-label="Ta bort" onClick={() => remove(n.id)} className="hover:opacity-70"><Trash2 size={14} /></button>
+                <div className="flex gap-2">
+                  <button aria-label="Växla checklista" title="Checklista" onClick={() => update(n.id, { is_checklist: !n.is_checklist })} className="hover:opacity-70"><ListChecks size={14} /></button>
+                  <button aria-label="Gör till mål" title="Gör till mål" onClick={() => toGoal(n)} className="hover:opacity-70"><Target size={14} /></button>
+                  <button aria-label="Ta bort" onClick={() => remove(n.id)} className="hover:opacity-70"><Trash2 size={14} /></button>
+                </div>
               </div>
             </div>
           ))}
         </div>
       </div>
+      {goalDraft && <GoalDialog goal={goalDraft} onClose={() => setGoalDraft(null)} />}
     </>
   );
 }
