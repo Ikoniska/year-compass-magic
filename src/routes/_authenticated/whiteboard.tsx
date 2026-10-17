@@ -179,14 +179,35 @@ function Whiteboard() {
               </button>
             ))}
           </div>
+          <button onClick={() => setDraw((d) => !d)} aria-pressed={draw}
+            className={`inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium ${draw ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+            <Pencil size={16} /> Rita
+          </button>
           <button onClick={() => add()} className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90">
             <Plus size={16} /> Ny lapp
           </button>
         </div>
       </PageHeader>
+      {draw && (
+        <div className="mb-3 flex flex-wrap items-center gap-3 rounded-xl border bg-card px-3 py-2 text-sm">
+          <span className="text-muted-foreground">Penna:</span>
+          {Object.keys(INKS).map((c) => (
+            <button key={c} aria-label={`Färg ${c}`} onClick={() => setInk(c)}
+              className={`h-6 w-6 rounded-full border-2 ${ink === c ? "border-foreground" : "border-transparent"}`} style={{ background: INKS[c] }} />
+          ))}
+          <span className="ml-2 text-muted-foreground">Tjocklek:</span>
+          {[2, 4, 8].map((s) => (
+            <button key={s} onClick={() => setPen(s)} className={`grid h-7 w-7 place-items-center rounded-md ${pen === s ? "bg-secondary" : ""}`}>
+              <span className="rounded-full bg-foreground" style={{ width: s + 2, height: s + 2 }} />
+            </button>
+          ))}
+          <button onClick={undoStroke} className="ml-auto inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"><Undo2 size={14} /> Ångra</button>
+          <button onClick={clearStrokes} className="inline-flex items-center gap-1 text-muted-foreground hover:text-destructive"><Eraser size={14} /> Rensa</button>
+        </div>
+      )}
       <div className="overflow-auto rounded-2xl border">
         <div ref={boardRef} className="whiteboard-grid relative h-[900px]" style={{ minWidth: BOARD_W }}
-          onDoubleClick={(e) => { if (e.target !== e.currentTarget) return; const r = e.currentTarget.getBoundingClientRect(); add(e.clientX - r.left - 100, e.clientY - r.top - 20); }}>
+          onDoubleClick={(e) => { if (draw || e.target !== e.currentTarget) return; const r = e.currentTarget.getBoundingClientRect(); add(e.clientX - r.left - 100, e.clientY - r.top - 20); }}>
           {zones.length > 0 && (
             <div className="pointer-events-none absolute inset-0 grid" style={{ gridTemplateColumns: `repeat(${zones.length}, 1fr)` }}>
               {zones.map((z, i) => (
@@ -199,10 +220,18 @@ function Whiteboard() {
           {!loading && notes.length === 0 && (
             <p className="pointer-events-none absolute inset-0 grid place-items-center text-sm text-muted-foreground">Tomt här – klicka "Ny lapp" för att börja.</p>
           )}
+          <svg onPointerDown={startStroke} className={`absolute inset-0 z-20 h-full w-full touch-none ${draw ? "cursor-crosshair" : "pointer-events-none"}`}>
+            {strokes.map((s) => <path key={s.id} d={pathOf(s.points)} stroke={INKS[s.color] ?? INKS.ink} strokeWidth={s.size} fill="none" strokeLinecap="round" strokeLinejoin="round" />)}
+            {live && <path d={pathOf(live)} stroke={INKS[ink]} strokeWidth={pen} fill="none" strokeLinecap="round" strokeLinejoin="round" />}
+          </svg>
           {notes.map((n) => (
             <div key={n.id} onPointerDown={(e) => startDrag(e, n)}
-              className={`note-${n.color} group absolute flex min-h-[180px] w-[200px] cursor-grab touch-none flex-col rounded-md p-3 shadow-lg active:cursor-grabbing`}
-              style={{ left: n.pos_x, top: n.pos_y, transform: `rotate(${n.rotation}deg)` }}>
+              className={`note-${n.color} group absolute flex cursor-grab touch-none flex-col rounded-md p-3 shadow-lg active:cursor-grabbing`}
+              style={{ left: n.pos_x, top: n.pos_y, width: n.width, minHeight: n.height, transform: `rotate(${n.rotation}deg)` }}>
+              <button aria-label="Vrid lappen" title="Dra för att vrida" onPointerDown={(e) => startRotate(e, n)}
+                className="absolute -top-3 left-1/2 grid h-6 w-6 -translate-x-1/2 cursor-grab place-items-center rounded-full border bg-background text-foreground opacity-0 shadow transition group-hover:opacity-100"><RotateCw size={12} /></button>
+              <span aria-label="Ändra storlek" title="Dra för att ändra storlek" onPointerDown={(e) => startResize(e, n)}
+                className="absolute bottom-0 right-0 h-4 w-4 cursor-nwse-resize opacity-0 transition group-hover:opacity-60" style={{ background: "linear-gradient(135deg, transparent 50%, currentColor 50%)" }} />
               {n.is_checklist ? (
                 <div className="flex flex-1 flex-col gap-1 text-sm">
                   <input value={n.content} placeholder="Rubrik…" onChange={(e) => update(n.id, { content: e.target.value }, true)}
