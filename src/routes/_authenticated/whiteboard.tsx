@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Plus, Trash2, Target, ListChecks, X } from "lucide-react";
+import { Plus, Trash2, Target, ListChecks, X, Pencil, Undo2, Eraser, RotateCw } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/AppShell";
 import { GoalDialog } from "@/components/Dialogs";
@@ -221,7 +221,7 @@ function Whiteboard() {
             <p className="pointer-events-none absolute inset-0 grid place-items-center text-sm text-muted-foreground">Tomt här – klicka "Ny lapp" för att börja.</p>
           )}
           <svg onPointerDown={startStroke} className={`absolute inset-0 z-20 h-full w-full touch-none ${draw ? "cursor-crosshair" : "pointer-events-none"}`}>
-            {strokes.map((s) => <path key={s.id} d={pathOf(s.points)} stroke={INKS[s.color] ?? INKS.ink} strokeWidth={s.size} fill="none" strokeLinecap="round" strokeLinejoin="round" />)}
+            {strokes.map((s) => <path key={s.id} d={pathOf(s.points)} stroke={INKS[s.color] ?? INKS["ink"]} strokeWidth={s.size} fill="none" strokeLinecap="round" strokeLinejoin="round" />)}
             {live && <path d={pathOf(live)} stroke={INKS[ink]} strokeWidth={pen} fill="none" strokeLinecap="round" strokeLinejoin="round" />}
           </svg>
           {notes.map((n) => (
