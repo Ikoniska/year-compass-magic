@@ -23,8 +23,11 @@ export const Route = createFileRoute("/_authenticated/whiteboard")({
 
 const COLORS = ["yellow", "green", "pink", "blue", "purple"] as const;
 type Item = { id: string; text: string; done: boolean };
-type Note = { id: string; content: string; color: string; pos_x: number; pos_y: number; rotation: number; items: Item[]; is_checklist: boolean };
-const FIELDS = "id,content,color,pos_x,pos_y,rotation,items,is_checklist";
+type Note = { id: string; content: string; color: string; pos_x: number; pos_y: number; rotation: number; items: Item[]; is_checklist: boolean; width: number; height: number };
+const FIELDS = "id,content,color,pos_x,pos_y,rotation,items,is_checklist,width,height";
+type Stroke = { id: string; color: string; size: number; points: [number, number][] };
+const INKS: Record<string, string> = { ink: "var(--foreground)", red: "var(--destructive)", blue: "var(--cat-arbete)", green: "var(--cat-halsa)", orange: "var(--primary)" };
+const pathOf = (p: [number, number][]) => p.map(([x, y], i) => `${i ? "L" : "M"}${x} ${y}`).join(" ");
 
 const LAYOUTS = {
   fri: { label: "Fri canvas", zones: [] as string[] },
@@ -43,6 +46,11 @@ function Whiteboard() {
   const [goalDraft, setGoalDraft] = useState<Goal | null>(null);
   const boardRef = useRef<HTMLDivElement>(null);
   const timers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  const [strokes, setStrokes] = useState<Stroke[]>([]);
+  const [draw, setDraw] = useState(false);
+  const [ink, setInk] = useState("ink");
+  const [pen, setPen] = useState(3);
+  const [live, setLive] = useState<[number, number][] | null>(null);
 
   useEffect(() => {
     const saved = localStorage.getItem("wb-layout") as LayoutKey | null;
@@ -53,7 +61,61 @@ function Whiteboard() {
         setNotes((data ?? []).map((n) => ({ ...n, items: (n.items as Item[] | null) ?? [] })));
         setLoading(false);
       });
+    supabase.from("whiteboard_strokes").select("id,color,size,points").order("created_at")
+      .then(({ data }) => setStrokes((data ?? []).map((s) => ({ ...s, points: s.points as [number, number][] }))));
   }, []);
+
+  function startStroke(e: React.PointerEvent) {
+    if (!draw) return;
+    e.preventDefault();
+    const r = boardRef.current!.getBoundingClientRect();
+    const pts: [number, number][] = [[e.clientX - r.left, e.clientY - r.top]];
+    setLive([...pts]);
+    const move = (ev: PointerEvent) => { pts.push([Math.round(ev.clientX - r.left), Math.round(ev.clientY - r.top)]); setLive([...pts]); };
+    const up = async () => {
+      window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up);
+      setLive(null);
+      if (pts.length < 2) return;
+      const { data, error } = await supabase.from("whiteboard_strokes").insert({ color: ink, size: pen, points: pts }).select("id").single();
+      if (error || !data) { toast.error("Kunde inte spara ritningen"); return; }
+      setStrokes((s) => [...s, { id: data.id, color: ink, size: pen, points: pts }]);
+    };
+    window.addEventListener("pointermove", move); window.addEventListener("pointerup", up);
+  }
+  async function undoStroke() {
+    const last = strokes[strokes.length - 1]; if (!last) return;
+    setStrokes((s) => s.slice(0, -1));
+    await supabase.from("whiteboard_strokes").delete().eq("id", last.id);
+  }
+  async function clearStrokes() {
+    if (!confirm("Rensa alla ritningar?")) return;
+    const ids = strokes.map((s) => s.id); setStrokes([]);
+    if (ids.length) await supabase.from("whiteboard_strokes").delete().in("id", ids);
+  }
+  function startResize(e: React.PointerEvent, note: Note) {
+    e.preventDefault(); e.stopPropagation();
+    const sx = e.clientX, sy = e.clientY, ow = note.width, oh = note.height;
+    let s = { width: ow, height: oh };
+    const move = (ev: PointerEvent) => {
+      s = { width: Math.max(140, Math.min(600, ow + ev.clientX - sx)), height: Math.max(120, Math.min(600, oh + ev.clientY - sy)) };
+      setNotes((n) => n.map((x) => (x.id === note.id ? { ...x, ...s } : x)));
+    };
+    const up = () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up); void save(note.id, s); };
+    window.addEventListener("pointermove", move); window.addEventListener("pointerup", up);
+  }
+  function startRotate(e: React.PointerEvent, note: Note) {
+    e.preventDefault(); e.stopPropagation();
+    const el = (e.currentTarget as HTMLElement).parentElement!.getBoundingClientRect();
+    const cx = el.left + el.width / 2, cy = el.top + el.height / 2;
+    let rot = note.rotation;
+    const move = (ev: PointerEvent) => {
+      rot = Math.round((Math.atan2(ev.clientY - cy, ev.clientX - cx) * 180) / Math.PI + 90);
+      if (Math.abs(rot) < 4) rot = 0;
+      setNotes((n) => n.map((x) => (x.id === note.id ? { ...x, rotation: rot } : x)));
+    };
+    const up = () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up); void save(note.id, { rotation: rot }); };
+    window.addEventListener("pointermove", move); window.addEventListener("pointerup", up);
+  }
   const pickLayout = (k: LayoutKey) => { setLayout(k); localStorage.setItem("wb-layout", k); };
 
   async function save(id: string, patch: Partial<Note>) {
