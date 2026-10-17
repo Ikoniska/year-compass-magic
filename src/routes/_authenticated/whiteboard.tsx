@@ -23,8 +23,11 @@ export const Route = createFileRoute("/_authenticated/whiteboard")({
 
 const COLORS = ["yellow", "green", "pink", "blue", "purple"] as const;
 type Item = { id: string; text: string; done: boolean };
-type Note = { id: string; content: string; color: string; pos_x: number; pos_y: number; rotation: number; items: Item[]; is_checklist: boolean };
-const FIELDS = "id,content,color,pos_x,pos_y,rotation,items,is_checklist";
+type Note = { id: string; content: string; color: string; pos_x: number; pos_y: number; rotation: number; items: Item[]; is_checklist: boolean; width: number; height: number };
+const FIELDS = "id,content,color,pos_x,pos_y,rotation,items,is_checklist,width,height";
+type Stroke = { id: string; color: string; size: number; points: [number, number][] };
+const INKS: Record<string, string> = { ink: "var(--foreground)", red: "var(--destructive)", blue: "var(--cat-arbete)", green: "var(--cat-halsa)", orange: "var(--primary)" };
+const pathOf = (p: [number, number][]) => p.map(([x, y], i) => `${i ? "L" : "M"}${x} ${y}`).join(" ");
 
 const LAYOUTS = {
   fri: { label: "Fri canvas", zones: [] as string[] },
@@ -43,6 +46,11 @@ function Whiteboard() {
   const [goalDraft, setGoalDraft] = useState<Goal | null>(null);
   const boardRef = useRef<HTMLDivElement>(null);
   const timers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  const [strokes, setStrokes] = useState<Stroke[]>([]);
+  const [draw, setDraw] = useState(false);
+  const [ink, setInk] = useState("ink");
+  const [pen, setPen] = useState(3);
+  const [live, setLive] = useState<[number, number][] | null>(null);
 
   useEffect(() => {
     const saved = localStorage.getItem("wb-layout") as LayoutKey | null;
@@ -53,7 +61,61 @@ function Whiteboard() {
         setNotes((data ?? []).map((n) => ({ ...n, items: (n.items as Item[] | null) ?? [] })));
         setLoading(false);
       });
+    supabase.from("whiteboard_strokes").select("id,color,size,points").order("created_at")
+      .then(({ data }) => setStrokes((data ?? []).map((s) => ({ ...s, points: s.points as [number, number][] }))));
   }, []);
+
+  function startStroke(e: React.PointerEvent) {
+    if (!draw) return;
+    e.preventDefault();
+    const r = boardRef.current!.getBoundingClientRect();
+    const pts: [number, number][] = [[e.clientX - r.left, e.clientY - r.top]];
+    setLive([...pts]);
+    const move = (ev: PointerEvent) => { pts.push([Math.round(ev.clientX - r.left), Math.round(ev.clientY - r.top)]); setLive([...pts]); };
+    const up = async () => {
+      window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up);
+      setLive(null);
+      if (pts.length < 2) return;
+      const { data, error } = await supabase.from("whiteboard_strokes").insert({ color: ink, size: pen, points: pts }).select("id").single();
+      if (error || !data) { toast.error("Kunde inte spara ritningen"); return; }
+      setStrokes((s) => [...s, { id: data.id, color: ink, size: pen, points: pts }]);
+    };
+    window.addEventListener("pointermove", move); window.addEventListener("pointerup", up);
+  }
+  async function undoStroke() {
+    const last = strokes[strokes.length - 1]; if (!last) return;
+    setStrokes((s) => s.slice(0, -1));
+    await supabase.from("whiteboard_strokes").delete().eq("id", last.id);
+  }
+  async function clearStrokes() {
+    if (!confirm("Rensa alla ritningar?")) return;
+    const ids = strokes.map((s) => s.id); setStrokes([]);
+    if (ids.length) await supabase.from("whiteboard_strokes").delete().in("id", ids);
+  }
+  function startResize(e: React.PointerEvent, note: Note) {
+    e.preventDefault(); e.stopPropagation();
+    const sx = e.clientX, sy = e.clientY, ow = note.width, oh = note.height;
+    let s = { width: ow, height: oh };
+    const move = (ev: PointerEvent) => {
+      s = { width: Math.max(140, Math.min(600, ow + ev.clientX - sx)), height: Math.max(120, Math.min(600, oh + ev.clientY - sy)) };
+      setNotes((n) => n.map((x) => (x.id === note.id ? { ...x, ...s } : x)));
+    };
+    const up = () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up); void save(note.id, s); };
+    window.addEventListener("pointermove", move); window.addEventListener("pointerup", up);
+  }
+  function startRotate(e: React.PointerEvent, note: Note) {
+    e.preventDefault(); e.stopPropagation();
+    const el = (e.currentTarget as HTMLElement).parentElement!.getBoundingClientRect();
+    const cx = el.left + el.width / 2, cy = el.top + el.height / 2;
+    let rot = note.rotation;
+    const move = (ev: PointerEvent) => {
+      rot = Math.round((Math.atan2(ev.clientY - cy, ev.clientX - cx) * 180) / Math.PI + 90);
+      if (Math.abs(rot) < 4) rot = 0;
+      setNotes((n) => n.map((x) => (x.id === note.id ? { ...x, rotation: rot } : x)));
+    };
+    const up = () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up); void save(note.id, { rotation: rot }); };
+    window.addEventListener("pointermove", move); window.addEventListener("pointerup", up);
+  }
   const pickLayout = (k: LayoutKey) => { setLayout(k); localStorage.setItem("wb-layout", k); };
 
   async function save(id: string, patch: Partial<Note>) {
@@ -117,14 +179,35 @@ function Whiteboard() {
               </button>
             ))}
           </div>
+          <button onClick={() => setDraw((d) => !d)} aria-pressed={draw}
+            className={`inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium ${draw ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+            <Pencil size={16} /> Rita
+          </button>
           <button onClick={() => add()} className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90">
             <Plus size={16} /> Ny lapp
           </button>
         </div>
       </PageHeader>
+      {draw && (
+        <div className="mb-3 flex flex-wrap items-center gap-3 rounded-xl border bg-card px-3 py-2 text-sm">
+          <span className="text-muted-foreground">Penna:</span>
+          {Object.keys(INKS).map((c) => (
+            <button key={c} aria-label={`Färg ${c}`} onClick={() => setInk(c)}
+              className={`h-6 w-6 rounded-full border-2 ${ink === c ? "border-foreground" : "border-transparent"}`} style={{ background: INKS[c] }} />
+          ))}
+          <span className="ml-2 text-muted-foreground">Tjocklek:</span>
+          {[2, 4, 8].map((s) => (
+            <button key={s} onClick={() => setPen(s)} className={`grid h-7 w-7 place-items-center rounded-md ${pen === s ? "bg-secondary" : ""}`}>
+              <span className="rounded-full bg-foreground" style={{ width: s + 2, height: s + 2 }} />
+            </button>
+          ))}
+          <button onClick={undoStroke} className="ml-auto inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"><Undo2 size={14} /> Ångra</button>
+          <button onClick={clearStrokes} className="inline-flex items-center gap-1 text-muted-foreground hover:text-destructive"><Eraser size={14} /> Rensa</button>
+        </div>
+      )}
       <div className="overflow-auto rounded-2xl border">
         <div ref={boardRef} className="whiteboard-grid relative h-[900px]" style={{ minWidth: BOARD_W }}
-          onDoubleClick={(e) => { if (e.target !== e.currentTarget) return; const r = e.currentTarget.getBoundingClientRect(); add(e.clientX - r.left - 100, e.clientY - r.top - 20); }}>
+          onDoubleClick={(e) => { if (draw || e.target !== e.currentTarget) return; const r = e.currentTarget.getBoundingClientRect(); add(e.clientX - r.left - 100, e.clientY - r.top - 20); }}>
           {zones.length > 0 && (
             <div className="pointer-events-none absolute inset-0 grid" style={{ gridTemplateColumns: `repeat(${zones.length}, 1fr)` }}>
               {zones.map((z, i) => (
@@ -137,10 +220,18 @@ function Whiteboard() {
           {!loading && notes.length === 0 && (
             <p className="pointer-events-none absolute inset-0 grid place-items-center text-sm text-muted-foreground">Tomt här – klicka "Ny lapp" för att börja.</p>
           )}
+          <svg onPointerDown={startStroke} className={`absolute inset-0 z-20 h-full w-full touch-none ${draw ? "cursor-crosshair" : "pointer-events-none"}`}>
+            {strokes.map((s) => <path key={s.id} d={pathOf(s.points)} stroke={INKS[s.color] ?? INKS.ink} strokeWidth={s.size} fill="none" strokeLinecap="round" strokeLinejoin="round" />)}
+            {live && <path d={pathOf(live)} stroke={INKS[ink]} strokeWidth={pen} fill="none" strokeLinecap="round" strokeLinejoin="round" />}
+          </svg>
           {notes.map((n) => (
             <div key={n.id} onPointerDown={(e) => startDrag(e, n)}
-              className={`note-${n.color} group absolute flex min-h-[180px] w-[200px] cursor-grab touch-none flex-col rounded-md p-3 shadow-lg active:cursor-grabbing`}
-              style={{ left: n.pos_x, top: n.pos_y, transform: `rotate(${n.rotation}deg)` }}>
+              className={`note-${n.color} group absolute flex cursor-grab touch-none flex-col rounded-md p-3 shadow-lg active:cursor-grabbing`}
+              style={{ left: n.pos_x, top: n.pos_y, width: n.width, minHeight: n.height, transform: `rotate(${n.rotation}deg)` }}>
+              <button aria-label="Vrid lappen" title="Dra för att vrida" onPointerDown={(e) => startRotate(e, n)}
+                className="absolute -top-3 left-1/2 grid h-6 w-6 -translate-x-1/2 cursor-grab place-items-center rounded-full border bg-background text-foreground opacity-0 shadow transition group-hover:opacity-100"><RotateCw size={12} /></button>
+              <span aria-label="Ändra storlek" title="Dra för att ändra storlek" onPointerDown={(e) => startResize(e, n)}
+                className="absolute bottom-0 right-0 h-4 w-4 cursor-nwse-resize opacity-0 transition group-hover:opacity-60" style={{ background: "linear-gradient(135deg, transparent 50%, currentColor 50%)" }} />
               {n.is_checklist ? (
                 <div className="flex flex-1 flex-col gap-1 text-sm">
                   <input value={n.content} placeholder="Rubrik…" onChange={(e) => update(n.id, { content: e.target.value }, true)}

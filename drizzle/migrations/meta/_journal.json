@@ -36,6 +36,13 @@
       "when": 1792235445981,
       "tag": "0004_whiteboard_checklists",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792235717449,
+      "tag": "0005_whiteboard_size_drawings",
+      "breakpoints": true
     }
   ]
 }
