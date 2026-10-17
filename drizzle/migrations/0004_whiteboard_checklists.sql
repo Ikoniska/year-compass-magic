@@ -1,0 +1,2 @@
+ALTER TABLE public.whiteboard_notes ADD COLUMN IF NOT EXISTS items jsonb NOT NULL DEFAULT '[]'::jsonb;
+ALTER TABLE public.whiteboard_notes ADD COLUMN IF NOT EXISTS is_checklist boolean NOT NULL DEFAULT false;
