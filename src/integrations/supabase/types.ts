@@ -173,6 +173,8 @@ export type Database = {
           content: string
           created_at: string
           id: string
+          is_checklist: boolean
+          items: Json
           pos_x: number
           pos_y: number
           rotation: number
@@ -184,6 +186,8 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          is_checklist?: boolean
+          items?: Json
           pos_x?: number
           pos_y?: number
           rotation?: number
@@ -195,6 +199,8 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          is_checklist?: boolean
+          items?: Json
           pos_x?: number
           pos_y?: number
           rotation?: number
