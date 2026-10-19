@@ -12,6 +12,8 @@ export const Route = createFileRoute("/auth")({
       { name: "description", content: "Logga in eller skapa ett konto för att planera ditt år med Ikoniska." },
       { property: "og:title", content: "Logga in – Ikoniska" },
       { property: "og:description", content: "Logga in eller skapa ett konto för att planera ditt år." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: AuthPage,
@@ -27,11 +29,13 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => { if (data.user) navigate({ to: "/oversikt", replace: true }); });
-    const { data } = supabase.auth.onAuthStateChange((e, s) => {
-      if (e === "SIGNED_IN" && s) navigate({ to: "/oversikt", replace: true });
+    let active = true;
+    supabase.auth.getSession().then(({ data, error }) => {
+      if (active && !error && data.session) navigate({ to: "/oversikt", replace: true });
+    }).catch(() => {
+      // Stay on the sign-in form if the stored session cannot be read.
     });
-    return () => data.subscription.unsubscribe();
+    return () => { active = false; };
   }, [navigate]);
 
   async function submit(e: React.FormEvent) {

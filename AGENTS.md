@@ -11,3 +11,4 @@
 
 - Planner data (goals, events, reflections) lives in Lovable Cloud tables scoped per user via RLS; all planner pages sit under `src/routes/_authenticated/` so sign-in gates them.
 - New accounts get example data from a database trigger on signup, never from client code, so seeding happens exactly once.
+- Keep auth-event navigation in the root subscriber and defer router/query work until after the auth callback returns, because route guards re-read auth and can deadlock on the session lock; preserve the integration-managed protected gate.

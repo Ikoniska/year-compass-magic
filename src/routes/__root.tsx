@@ -121,12 +121,25 @@ function RootComponent() {
   const router = useRouter();
 
   useEffect(() => {
+    let pending: ReturnType<typeof setTimeout> | undefined;
     const { data } = supabase.auth.onAuthStateChange((event) => {
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
-      router.invalidate();
-      if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
+      // Auth callbacks run while the session lock is held. Route guards and
+      // query fetchers read auth again, so start them only after it is released.
+      clearTimeout(pending);
+      pending = setTimeout(() => {
+        if (event === "SIGNED_IN" && router.state.location.pathname === "/auth") {
+          void router.navigate({ to: "/oversikt", replace: true });
+        } else {
+          void router.invalidate();
+        }
+        if (event !== "SIGNED_OUT") void queryClient.invalidateQueries();
+      }, 0);
     });
-    return () => data.subscription.unsubscribe();
+    return () => {
+      clearTimeout(pending);
+      data.subscription.unsubscribe();
+    };
   }, [router, queryClient]);
 
   return (

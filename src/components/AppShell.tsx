@@ -29,7 +29,7 @@ function ThemeToggle() {
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { user } = useRouteContext({ from: "/_authenticated" });
-  const email = user.email ?? "";
+  const email = user?.email ?? "";
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   async function signOut() {
