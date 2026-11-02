@@ -39,7 +39,7 @@ type LayoutKey = keyof typeof LAYOUTS;
 const BOARD_W = 1200;
 
 function Whiteboard() {
-  const { newId } = usePlanner();
+  const { newId, wsId } = usePlanner();
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
   const [layout, setLayout] = useState<LayoutKey>("fri");
@@ -55,15 +55,15 @@ function Whiteboard() {
   useEffect(() => {
     const saved = localStorage.getItem("wb-layout") as LayoutKey | null;
     if (saved && saved in LAYOUTS) setLayout(saved);
-    supabase.from("whiteboard_notes").select(FIELDS).order("created_at")
+    supabase.from("whiteboard_notes").select(FIELDS).eq("workspace_id", wsId).order("created_at")
       .then(({ data, error }) => {
         if (error) toast.error("Kunde inte hämta lappar");
         setNotes((data ?? []).map((n) => ({ ...n, items: (n.items as Item[] | null) ?? [] })));
         setLoading(false);
       });
-    supabase.from("whiteboard_strokes").select("id,color,size,points").order("created_at")
+    supabase.from("whiteboard_strokes").select("id,color,size,points").eq("workspace_id", wsId).order("created_at")
       .then(({ data }) => setStrokes((data ?? []).map((s) => ({ ...s, points: s.points as [number, number][] }))));
-  }, []);
+  }, [wsId]);
 
   function startStroke(e: React.PointerEvent) {
     if (!draw) return;
@@ -76,7 +76,7 @@ function Whiteboard() {
       window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up);
       setLive(null);
       if (pts.length < 2) return;
-      const { data, error } = await supabase.from("whiteboard_strokes").insert({ color: ink, size: pen, points: pts }).select("id").single();
+      const { data, error } = await supabase.from("whiteboard_strokes").insert({ color: ink, size: pen, points: pts, workspace_id: wsId }).select("id").single();
       if (error || !data) { toast.error("Kunde inte spara ritningen"); return; }
       setStrokes((s) => [...s, { id: data.id, color: ink, size: pen, points: pts }]);
     };
@@ -129,7 +129,7 @@ function Whiteboard() {
     timers.current[id] = setTimeout(() => save(id, patch), 500);
   }
   async function add(x = 40 + Math.random() * 200, y = 60 + Math.random() * 120) {
-    const row = { content: "", color: COLORS[Math.floor(Math.random() * COLORS.length)] ?? "yellow", pos_x: x, pos_y: y, rotation: Math.round((Math.random() * 4 - 2) * 10) / 10 };
+    const row = { content: "", color: COLORS[Math.floor(Math.random() * COLORS.length)] ?? "yellow", pos_x: x, pos_y: y, rotation: Math.round((Math.random() * 4 - 2) * 10) / 10, workspace_id: wsId };
     const { data, error } = await supabase.from("whiteboard_notes").insert(row).select(FIELDS).single();
     if (error || !data) { toast.error("Kunde inte skapa lapp"); return; }
     setNotes((n) => [...n, { ...data, items: (data.items as Item[] | null) ?? [] }]);

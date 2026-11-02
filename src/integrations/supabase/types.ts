@@ -23,6 +23,7 @@ export type Database = {
           month: number
           title: string
           user_id: string
+          workspace_id: string | null
         }
         Insert: {
           category: string
@@ -32,6 +33,7 @@ export type Database = {
           month: number
           title: string
           user_id?: string
+          workspace_id?: string | null
         }
         Update: {
           category?: string
@@ -41,11 +43,48 @@ export type Database = {
           month?: number
           title?: string
           user_id?: string
+          workspace_id?: string | null
         }
         Relationships: []
       }
+      goal_comments: {
+        Row: {
+          author_name: string
+          body: string
+          created_at: string
+          goal_id: string
+          id: string
+          workspace_id: string
+        }
+        Insert: {
+          author_name?: string
+          body: string
+          created_at?: string
+          goal_id: string
+          id?: string
+          workspace_id: string
+        }
+        Update: {
+          author_name?: string
+          body?: string
+          created_at?: string
+          goal_id?: string
+          id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "goal_comments_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       goals: {
         Row: {
+          assignee: string
           category: string
           created_at: string
           end_month: number
@@ -57,8 +96,10 @@ export type Database = {
           status: string
           title: string
           user_id: string
+          workspace_id: string | null
         }
         Insert: {
+          assignee?: string
           category: string
           created_at?: string
           end_month?: number
@@ -70,8 +111,10 @@ export type Database = {
           status?: string
           title: string
           user_id?: string
+          workspace_id?: string | null
         }
         Update: {
+          assignee?: string
           category?: string
           created_at?: string
           end_month?: number
@@ -83,6 +126,7 @@ export type Database = {
           status?: string
           title?: string
           user_id?: string
+          workspace_id?: string | null
         }
         Relationships: []
       }
@@ -182,6 +226,7 @@ export type Database = {
           updated_at: string
           user_id: string
           width: number
+          workspace_id: string | null
         }
         Insert: {
           color?: string
@@ -197,6 +242,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
           width?: number
+          workspace_id?: string | null
         }
         Update: {
           color?: string
@@ -212,6 +258,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
           width?: number
+          workspace_id?: string | null
         }
         Relationships: []
       }
@@ -223,6 +270,7 @@ export type Database = {
           points: Json
           size: number
           user_id: string
+          workspace_id: string | null
         }
         Insert: {
           color?: string
@@ -231,6 +279,7 @@ export type Database = {
           points?: Json
           size?: number
           user_id?: string
+          workspace_id?: string | null
         }
         Update: {
           color?: string
@@ -239,6 +288,72 @@ export type Database = {
           points?: Json
           size?: number
           user_id?: string
+          workspace_id?: string | null
+        }
+        Relationships: []
+      }
+      workspace_members: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          name: string
+          role: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          name?: string
+          role?: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          role?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_members_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspaces: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          owner_email: string
+          owner_id: string
+          share_enabled: boolean
+          share_token: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name?: string
+          owner_email?: string
+          owner_id: string
+          share_enabled?: boolean
+          share_token?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          owner_email?: string
+          owner_id?: string
+          share_enabled?: boolean
+          share_token?: string | null
         }
         Relationships: []
       }
@@ -268,7 +383,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      add_shared_comment: {
+        Args: { _body: string; _goal: string; _name: string; _token: string }
+        Returns: undefined
+      }
+      get_shared_plan: { Args: { _token: string }; Returns: Json }
+      personal_workspace: { Args: { _uid: string }; Returns: string }
+      ws_role: { Args: { _ws: string }; Returns: string }
     }
     Enums: {
       [_ in never]: never
