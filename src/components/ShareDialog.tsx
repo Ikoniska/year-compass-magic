@@ -20,9 +20,9 @@ export function ShareDialog({ onClose }: { onClose: () => void }) {
   const toggle = () => updateWorkspace({ share_enabled: !workspace.share_enabled, share_token: workspace.share_token ?? newToken() });
   const invite = async () => {
     const e = email.trim().toLowerCase();
-    if (!/^\S+@\S+\.\S+$/.test(e)) return toast.error("Ange en giltig e-postadress");
+    if (!/^\S+@\S+\.\S+$/.test(e)) { toast.error("Ange en giltig e-postadress"); return; }
     const { error } = await supabase.from("workspace_members").insert({ workspace_id: workspace.id, email: e, name: name.trim(), role: r });
-    if (error) return toast.error(error.code === "23505" ? "Personen är redan inbjuden" : "Kunde inte bjuda in: " + error.message);
+    if (error) { toast.error(error.code === "23505" ? "Personen är redan inbjuden" : "Kunde inte bjuda in: " + error.message); return; }
     setEmail(""); setName(""); reloadMembers();
     toast.success("Inbjuden! Personen loggar in med sin e-post och väljer planen i menyn.");
   };
