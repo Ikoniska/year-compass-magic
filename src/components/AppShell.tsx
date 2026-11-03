@@ -1,8 +1,10 @@
 import { Link, useNavigate, useRouteContext } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, type ReactNode } from "react";
-import { LayoutGrid, Target, GanttChart, NotebookPen, StickyNote, Printer, Award, Moon, Sun, LogOut } from "lucide-react";
+import { LayoutGrid, Target, GanttChart, NotebookPen, StickyNote, Printer, Award, Moon, Sun, LogOut, Share2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { usePlanner } from "@/lib/planner";
+import { ShareDialog } from "@/components/ShareDialog";
 const logo = { url: "/ikoniska-logo.webp" };
 
 const NAV = [
@@ -27,11 +29,29 @@ function ThemeToggle() {
   );
 }
 
+function PlanBar({ onShare }: { onShare: () => void }) {
+  const { workspaces, wsId, switchWorkspace, me } = usePlanner();
+  return (
+    <div className="flex items-center gap-2">
+      {workspaces.length > 1 && (
+        <select aria-label="Välj plan" value={wsId} onChange={(e) => switchWorkspace(e.target.value)}
+          className="min-w-0 flex-1 rounded-lg border bg-card px-2 py-1.5 text-xs">
+          {workspaces.map((w) => <option key={w.id} value={w.id}>{w.owner_email === me ? w.name : `${w.name} (${w.owner_email})`}</option>)}
+        </select>
+      )}
+      <button onClick={onShare} className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90">
+        <Share2 size={14} /> Dela
+      </button>
+    </div>
+  );
+}
+
 export function AppShell({ children }: { children: ReactNode }) {
   const { user } = useRouteContext({ from: "/_authenticated" });
   const email = user?.email ?? "";
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [share, setShare] = useState(false);
   async function signOut() {
     await queryClient.cancelQueries();
     queryClient.clear();
@@ -40,10 +60,12 @@ export function AppShell({ children }: { children: ReactNode }) {
   }
   return (
     <div className="min-h-screen md:flex">
+      {share && <ShareDialog onClose={() => setShare(false)} />}
       <aside className="hidden w-60 shrink-0 flex-col border-r bg-sidebar p-4 md:flex md:sticky md:top-0 md:h-screen">
-        <Link to="/oversikt" className="mb-8 block px-2">
+        <Link to="/oversikt" className="mb-6 block px-2">
           <img src={logo.url} alt="Ikoniska" className="logo-img h-9 w-auto" />
         </Link>
+        <div className="mb-6 px-2"><PlanBar onShare={() => setShare(true)} /></div>
         <nav className="space-y-1">
           {NAV.map(({ to, label, icon: Icon }) => (
             <Link key={to} to={to} activeOptions={{ exact: true }}
@@ -64,6 +86,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-30 flex items-center justify-between border-b bg-background/85 px-4 py-3 backdrop-blur md:hidden">
         <img src={logo.url} alt="Ikoniska" className="logo-img h-8 w-auto" />
         <div className="flex items-center gap-2">
+          <PlanBar onShare={() => setShare(true)} />
           <button aria-label="Logga ut" onClick={signOut} className="rounded-lg border bg-card p-2 text-muted-foreground hover:text-foreground"><LogOut size={16} /></button>
           <ThemeToggle />
         </div>

@@ -20,6 +20,7 @@ import { Route as AuthenticatedRapportRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedReflektionRouteImport } from './routes/_authenticated/reflektion'
 import { Route as AuthenticatedTidslinjeRouteImport } from './routes/_authenticated/tidslinje'
 import { Route as AuthenticatedWhiteboardRouteImport } from './routes/_authenticated/whiteboard'
+import { Route as DeladTokenRouteImport } from './routes/delad.$token'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -75,6 +76,11 @@ const AuthenticatedWhiteboardRoute = AuthenticatedWhiteboardRouteImport.update({
   path: '/whiteboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const DeladTokenRoute = DeladTokenRouteImport.update({
+  id: '/delad/$token',
+  path: '/delad/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/reflektion': typeof AuthenticatedReflektionRoute
   '/tidslinje': typeof AuthenticatedTidslinjeRoute
   '/whiteboard': typeof AuthenticatedWhiteboardRoute
+  '/delad/$token': typeof DeladTokenRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByTo {
   '/reflektion': typeof AuthenticatedReflektionRoute
   '/tidslinje': typeof AuthenticatedTidslinjeRoute
   '/whiteboard': typeof AuthenticatedWhiteboardRoute
+  '/delad/$token': typeof DeladTokenRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -113,6 +121,7 @@ export interface FileRoutesById {
   '/_authenticated/reflektion': typeof AuthenticatedReflektionRoute
   '/_authenticated/tidslinje': typeof AuthenticatedTidslinjeRoute
   '/_authenticated/whiteboard': typeof AuthenticatedWhiteboardRoute
+  '/delad/$token': typeof DeladTokenRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -127,6 +136,7 @@ export interface FileRouteTypes {
     | '/reflektion'
     | '/tidslinje'
     | '/whiteboard'
+    | '/delad/$token'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -139,6 +149,7 @@ export interface FileRouteTypes {
     | '/reflektion'
     | '/tidslinje'
     | '/whiteboard'
+    | '/delad/$token'
   id:
     | '__root__'
     | '/'
@@ -152,6 +163,7 @@ export interface FileRouteTypes {
     | '/_authenticated/reflektion'
     | '/_authenticated/tidslinje'
     | '/_authenticated/whiteboard'
+    | '/delad/$token'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -159,6 +171,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  DeladTokenRoute: typeof DeladTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -240,6 +253,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWhiteboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/delad/$token': {
+      id: '/delad/$token'
+      path: '/delad/$token'
+      fullPath: '/delad/$token'
+      preLoaderRoute: typeof DeladTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -271,6 +291,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  DeladTokenRoute: DeladTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
