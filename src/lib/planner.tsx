@@ -47,6 +47,7 @@ interface Ctx {
   wsId: string; workspaces: Workspace[]; workspace: Workspace | undefined; role: Role; canEdit: boolean;
   members: Member[]; people: Person[]; me: string;
   switchWorkspace: (id: string) => void; reloadMembers: () => void; updateWorkspace: (p: Partial<Workspace>) => Promise<void>;
+  createWorkspace: (name: string) => Promise<void>;
   goals: Goal[]; events: PlanEvent[]; reflections: Reflections; loading: boolean;
   saveGoal: (g: Goal) => void; deleteGoal: (id: string) => void;
   saveEvent: (e: PlanEvent) => void; deleteEvent: (id: string) => void;
@@ -123,6 +124,12 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
     ...members.map((m) => ({ email: m.email, label: m.name || m.email })),
   ].map((p, i) => ({ ...p, initials: initials(p.label), color: PALETTE[i % PALETTE.length]! }));
   const switchWorkspace = (id: string) => { localStorage.setItem("ws", id); setWsId(id); };
+  const createWorkspace = async (name: string) => {
+    const { data, error } = await supabase.from("workspaces")
+      .insert({ owner_id: uidSelf, owner_email: me, name }).select("*").single();
+    fail(error);
+    if (data) { setWorkspaces((l) => [...l, data as Workspace]); switchWorkspace(data.id); toast.success(`Planen "${name}" skapades`); }
+  };
   const updateWorkspace = async (p: Partial<Workspace>) => {
     const { error } = await supabase.from("workspaces").update(p).eq("id", wsId);
     fail(error);
