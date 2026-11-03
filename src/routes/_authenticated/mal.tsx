@@ -18,7 +18,7 @@ export const Route = createFileRoute("/_authenticated/mal")({
 });
 
 function Goals() {
-  const { goals, saveGoal } = usePlanner();
+  const { goals, saveGoal, people } = usePlanner();
   const [filter, setFilter] = useState<Category | "alla">("alla");
   const [edit, setEdit] = useState<Goal | "new" | null>(null);
   const list = goals
@@ -47,7 +47,7 @@ function Goals() {
                 <button onClick={() => setEdit(g)} className="text-left">
                   <span className={`mb-2 inline-block rounded-full px-2 py-0.5 text-[11px] font-medium ${c.cls}`}>{c.label}</span>
                   <h3 className="font-display text-lg font-semibold leading-snug group-hover:text-primary">{g.title}</h3>
-                  <p className="mt-0.5 text-xs text-muted-foreground">{MONTHS_SHORT[g.start]} – {MONTHS_SHORT[g.end]}</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">{MONTHS_SHORT[g.start]} – {MONTHS_SHORT[g.end]}{g.assignee ? ` · Ansvarig: ${people.find((p) => p.email === g.assignee)?.label ?? g.assignee}` : ""}</p>
                 </button>
                 <select value={g.status} onChange={(e) => saveGoal({ ...g, status: e.target.value as Goal["status"] })}
                   className={`rounded-md border px-2 py-1 text-xs font-medium status-${g.status}`} aria-label="Status">
