@@ -25,7 +25,7 @@ export const btnPrimary = "inline-flex items-center justify-center gap-1.5 round
 export const btnGhost = "inline-flex items-center justify-center gap-1.5 rounded-lg border bg-card px-4 py-2 text-sm font-medium transition hover:bg-muted";
 
 export function GoalDialog({ goal, onClose }: { goal?: Goal | undefined; onClose: () => void }) {
-  const { saveGoal, deleteGoal, newId } = usePlanner();
+  const { saveGoal, deleteGoal, newId, people } = usePlanner();
   const [g, setG] = useState<Goal>(goal ?? { id: newId(), title: "", category: "arbete", status: "ej", start: new Date().getMonth(), end: Math.min(11, new Date().getMonth() + 2), milestones: [] });
   const [ms, setMs] = useState("");
   const [ai, setAi] = useState(false);
@@ -77,6 +77,15 @@ export function GoalDialog({ goal, onClose }: { goal?: Goal | undefined; onClose
             </select>
           </div>
         </div>
+        {people.length > 1 && (
+          <div>
+            <label className={label}>Ansvarig för målet</label>
+            <select className={field} value={g.assignee ?? ""} onChange={(e) => set({ assignee: e.target.value })}>
+              <option value="">Ingen</option>
+              {people.map((p) => <option key={p.email} value={p.email}>{p.label}</option>)}
+            </select>
+          </div>
+        )}
         <div>
           <div className="mb-1.5 flex items-center justify-between">
             <label className={`${label} mb-0`}>Delmål</label>
@@ -90,6 +99,13 @@ export function GoalDialog({ goal, onClose }: { goal?: Goal | undefined; onClose
               <li key={m.id} className="flex items-center gap-2 text-sm">
                 <input type="checkbox" checked={m.done} className="accent-primary" onChange={() => set({ milestones: g.milestones.map((x) => x.id === m.id ? { ...x, done: !x.done } : x) })} />
                 <span className={`flex-1 ${m.done ? "text-muted-foreground line-through" : ""}`}>{m.title}</span>
+                {people.length > 1 && (
+                  <select aria-label="Ansvarig för delmål" className="max-w-28 rounded-md border bg-background px-1 py-0.5 text-xs" value={m.assignee ?? ""}
+                    onChange={(e) => set({ milestones: g.milestones.map((x) => x.id === m.id ? { ...x, assignee: e.target.value } : x) })}>
+                    <option value="">Ingen</option>
+                    {people.map((p) => <option key={p.email} value={p.email}>{p.label}</option>)}
+                  </select>
+                )}
                 <button type="button" onClick={() => set({ milestones: g.milestones.filter((x) => x.id !== m.id) })} className="text-muted-foreground hover:text-destructive"><X size={14} /></button>
               </li>
             ))}
