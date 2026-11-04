@@ -148,6 +148,41 @@ export type Database = {
         }
         Relationships: []
       }
+      quarter_comments: {
+        Row: {
+          author_name: string
+          body: string
+          created_at: string
+          id: string
+          quarter: number
+          workspace_id: string
+        }
+        Insert: {
+          author_name?: string
+          body: string
+          created_at?: string
+          id?: string
+          quarter: number
+          workspace_id: string
+        }
+        Update: {
+          author_name?: string
+          body?: string
+          created_at?: string
+          id?: string
+          quarter?: number
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quarter_comments_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quarter_energy: {
         Row: {
           level: string
@@ -327,6 +362,29 @@ export type Database = {
           },
         ]
       }
+      workspace_share_secrets: {
+        Row: {
+          pw_hash: string
+          workspace_id: string
+        }
+        Insert: {
+          pw_hash: string
+          workspace_id: string
+        }
+        Update: {
+          pw_hash?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_share_secrets_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: true
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspaces: {
         Row: {
           created_at: string
@@ -335,6 +393,7 @@ export type Database = {
           owner_email: string
           owner_id: string
           share_enabled: boolean
+          share_has_password: boolean
           share_token: string | null
         }
         Insert: {
@@ -344,6 +403,7 @@ export type Database = {
           owner_email?: string
           owner_id: string
           share_enabled?: boolean
+          share_has_password?: boolean
           share_token?: string | null
         }
         Update: {
@@ -353,6 +413,7 @@ export type Database = {
           owner_email?: string
           owner_id?: string
           share_enabled?: boolean
+          share_has_password?: boolean
           share_token?: string | null
         }
         Relationships: []
@@ -387,8 +448,28 @@ export type Database = {
         Args: { _body: string; _goal: string; _name: string; _token: string }
         Returns: undefined
       }
+      add_shared_comment_v2: {
+        Args: {
+          _body: string
+          _goal: string
+          _name: string
+          _pw: string
+          _quarter: number
+          _token: string
+        }
+        Returns: undefined
+      }
       get_shared_plan: { Args: { _token: string }; Returns: Json }
+      get_shared_plan_v2: {
+        Args: { _pw: string; _token: string }
+        Returns: Json
+      }
       personal_workspace: { Args: { _uid: string }; Returns: string }
+      set_share_password: {
+        Args: { _pw: string; _ws: string }
+        Returns: undefined
+      }
+      shared_ws: { Args: { _pw: string; _token: string }; Returns: string }
       ws_role: { Args: { _ws: string }; Returns: string }
     }
     Enums: {
