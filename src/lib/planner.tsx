@@ -47,7 +47,7 @@ interface Ctx {
   wsId: string; workspaces: Workspace[]; workspace: Workspace | undefined; role: Role; canEdit: boolean;
   members: Member[]; people: Person[]; me: string;
   switchWorkspace: (id: string) => void; reloadMembers: () => void; updateWorkspace: (p: Partial<Workspace>) => Promise<void>;
-  createWorkspace: (name: string) => Promise<void>;
+  createWorkspace: (name: string) => Promise<void>; deleteWorkspace: () => Promise<void>;
   goals: Goal[]; events: PlanEvent[]; reflections: Reflections; loading: boolean;
   saveGoal: (g: Goal) => void; deleteGoal: (id: string) => void;
   saveEvent: (e: PlanEvent) => void; deleteEvent: (id: string) => void;
@@ -135,6 +135,13 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
     fail(error);
     if (!error) setWorkspaces((l) => l.map((w) => (w.id === wsId ? { ...w, ...p } : w)));
   };
+  const deleteWorkspace = async () => {
+    const rest = workspaces.filter((w) => w.id !== wsId);
+    if (!rest.length) { toast.error("Du kan inte ta bort din sista plan"); return; }
+    const { error } = await supabase.from("workspaces").delete().eq("id", wsId);
+    fail(error);
+    if (!error) { setWorkspaces(rest); switchWorkspace(rest[0]!.id); toast.success("Planen togs bort"); }
+  };
   const own = (list: { id: string }[], id: string) => list.some((x) => x.id === id);
 
   const upsert = <T extends { id: string }>(list: T[], item: T) =>
@@ -185,7 +192,7 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <PlannerCtx.Provider value={{ wsId, workspaces, workspace, role, canEdit, members, people, me, switchWorkspace, reloadMembers, updateWorkspace, goals, events, reflections, loading, newId: uid, saveGoal, deleteGoal, saveEvent, deleteEvent, setReflection }}>
+    <PlannerCtx.Provider value={{ wsId, workspaces, workspace, role, canEdit, members, people, me, switchWorkspace, reloadMembers, updateWorkspace, createWorkspace, deleteWorkspace, goals, events, reflections, loading, newId: uid, saveGoal, deleteGoal, saveEvent, deleteEvent, setReflection }}>
       {children}
     </PlannerCtx.Provider>
   );
