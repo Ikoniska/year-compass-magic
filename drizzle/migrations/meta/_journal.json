@@ -57,6 +57,13 @@
       "when": 1793777346608,
       "tag": "0007_workspace_delete",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1793777788681,
+      "tag": "0008_workspaces_multiple_per_owner",
+      "breakpoints": true
     }
   ]
 }

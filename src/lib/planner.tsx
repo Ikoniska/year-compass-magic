@@ -125,8 +125,10 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
   ].map((p, i) => ({ ...p, initials: initials(p.label), color: PALETTE[i % PALETTE.length]! }));
   const switchWorkspace = (id: string) => { localStorage.setItem("ws", id); setWsId(id); };
   const createWorkspace = async (name: string) => {
+    const { data: u } = await supabase.auth.getUser();
+    if (!u.user) { toast.error("Du behöver logga in igen"); return; }
     const { data, error } = await supabase.from("workspaces")
-      .insert({ owner_id: uidSelf, owner_email: me, name }).select("*").single();
+      .insert({ owner_id: u.user.id, owner_email: u.user.email ?? me, name }).select("*").single();
     fail(error);
     if (data) { setWorkspaces((l) => [...l, data as Workspace]); switchWorkspace(data.id); toast.success(`Planen "${name}" skapades`); }
   };
