@@ -71,6 +71,13 @@
       "when": 1793777979282,
       "tag": "0009_workspaces_read_owner_direct",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1793782134381,
+      "tag": "0010_share_password_quarter_comments",
+      "breakpoints": true
     }
   ]
 }
