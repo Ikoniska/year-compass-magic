@@ -192,7 +192,7 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <PlannerCtx.Provider value={{ wsId, workspaces, workspace, role, canEdit, members, people, me, switchWorkspace, reloadMembers, updateWorkspace, goals, events, reflections, loading, newId: uid, saveGoal, deleteGoal, saveEvent, deleteEvent, setReflection }}>
+    <PlannerCtx.Provider value={{ wsId, workspaces, workspace, role, canEdit, members, people, me, switchWorkspace, reloadMembers, updateWorkspace, createWorkspace, deleteWorkspace, goals, events, reflections, loading, newId: uid, saveGoal, deleteGoal, saveEvent, deleteEvent, setReflection }}>
       {children}
     </PlannerCtx.Provider>
   );

@@ -30,15 +30,21 @@ function ThemeToggle() {
 }
 
 function PlanBar({ onShare }: { onShare: () => void }) {
-  const { workspaces, wsId, switchWorkspace, me } = usePlanner();
+  const { workspaces, wsId, workspace, role, switchWorkspace, me, createWorkspace, updateWorkspace, deleteWorkspace } = usePlanner();
+  const isOwner = role === "owner";
+  const onNew = () => { const n = prompt("Namn på den nya planen:")?.trim(); if (n) createWorkspace(n); };
+  const onRename = () => { const n = prompt("Nytt namn på planen:", workspace?.name)?.trim(); if (n) updateWorkspace({ name: n }); };
+  const onDelete = () => { if (confirm(`Ta bort planen "${workspace?.name}" med alla mål, händelser och whiteboard? Det går inte att ångra.`)) deleteWorkspace(); };
+  const btn = "rounded-lg border bg-card p-1.5 text-muted-foreground hover:text-foreground";
   return (
-    <div className="flex items-center gap-2">
-      {workspaces.length > 1 && (
-        <select aria-label="Välj plan" value={wsId} onChange={(e) => switchWorkspace(e.target.value)}
-          className="min-w-0 flex-1 rounded-lg border bg-card px-2 py-1.5 text-xs">
-          {workspaces.map((w) => <option key={w.id} value={w.id}>{w.owner_email === me ? w.name : `${w.name} (${w.owner_email})`}</option>)}
-        </select>
-      )}
+    <div className="flex flex-wrap items-center gap-1.5">
+      <select aria-label="Välj plan" value={wsId} onChange={(e) => switchWorkspace(e.target.value)}
+        className="min-w-0 max-w-[9rem] flex-1 rounded-lg border bg-card px-2 py-1.5 text-xs">
+        {workspaces.map((w) => <option key={w.id} value={w.id}>{w.owner_email === me ? w.name : `${w.name} (${w.owner_email})`}</option>)}
+      </select>
+      <button aria-label="Ny plan" title="Ny plan" onClick={onNew} className={btn}><Plus size={14} /></button>
+      {isOwner && <button aria-label="Byt namn" title="Byt namn" onClick={onRename} className={btn}><Pencil size={14} /></button>}
+      {isOwner && workspaces.length > 1 && <button aria-label="Ta bort plan" title="Ta bort plan" onClick={onDelete} className={btn}><Trash2 size={14} /></button>}
       <button onClick={onShare} className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90">
         <Share2 size={14} /> Dela
       </button>
