@@ -1,7 +1,7 @@
 import { Link, useNavigate, useRouteContext } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, type ReactNode } from "react";
-import { LayoutGrid, Target, GanttChart, NotebookPen, StickyNote, Printer, Award, Moon, Sun, LogOut, Share2 } from "lucide-react";
+import { LayoutGrid, Target, GanttChart, NotebookPen, StickyNote, Printer, Award, Moon, Sun, LogOut, Share2, Plus, Pencil, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { usePlanner } from "@/lib/planner";
 import { ShareDialog } from "@/components/ShareDialog";
