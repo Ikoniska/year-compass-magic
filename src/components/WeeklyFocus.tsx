@@ -1,3 +1,4 @@
+import { Avatar, PersonFilter } from "@/components/Avatar";
 import { useEffect, useState } from "react";
 import { Target, Plus, X, Check } from "lucide-react";
 import { toast } from "sonner";
@@ -16,7 +17,9 @@ export function isoWeek(d = new Date()) {
 }
 
 export function WeeklyFocus() {
-  const { goals, saveGoal } = usePlanner();
+  const { goals, saveGoal, people } = usePlanner();
+  const [who, setWho] = useState("");
+  const pick = (e?: string) => people.find((p) => p.email === e);
   const { week, key } = isoWeek();
   const [items, setItems] = useState<Item[]>([]);
   const [picking, setPicking] = useState(false);
@@ -39,6 +42,7 @@ export function WeeklyFocus() {
     const m = g?.milestones.find((x) => x.id === it.milestoneId);
     return g && m ? { it, g, m } : null;
   }).filter((x): x is NonNullable<typeof x> => !!x);
+  const shown = resolved.filter((r) => !who || (r.m.assignee || r.g.assignee) === who);
 
   const toggle = (gid: string, mid: string) => {
     const g = goals.find((x) => x.id === gid);
@@ -67,8 +71,9 @@ export function WeeklyFocus() {
 
       {resolved.length === 0 && !picking && <p className="text-sm text-muted-foreground">Inget fokus valt ännu för den här veckan.</p>}
 
+      {resolved.length > 0 && <div className="mb-3"><PersonFilter people={people} value={who} onChange={setWho} /></div>}
       <ul className="space-y-2">
-        {resolved.map(({ g, m }) => (
+        {shown.map(({ g, m }) => (
           <li key={m.id} className="flex items-center gap-3 rounded-xl border bg-background px-3 py-2.5">
             <button onClick={() => toggle(g.id, m.id)} aria-label="Bocka av"
               className={`grid h-5 w-5 shrink-0 place-items-center rounded-md border transition ${m.done ? "border-primary bg-primary text-primary-foreground" : ""}`}>
@@ -78,6 +83,7 @@ export function WeeklyFocus() {
               <p className={`truncate text-sm font-medium ${m.done ? "text-muted-foreground line-through" : ""}`}>{m.title}</p>
               <p className="truncate text-xs text-muted-foreground"><span className={`mr-1 inline-block h-2 w-2 rounded-full ${cat(g.category).dot}`} />{g.title}</p>
             </div>
+            <Avatar person={pick(m.assignee || g.assignee)} />
             <button onClick={() => persist(items.filter((i) => i.milestoneId !== m.id))} className="text-muted-foreground hover:text-destructive" aria-label="Ta bort från fokus"><X size={15} /></button>
           </li>
         ))}

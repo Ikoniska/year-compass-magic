@@ -14,6 +14,13 @@ export function ShareDialog({ onClose }: { onClose: () => void }) {
   const [name, setName] = useState("");
   const [r, setR] = useState<"viewer" | "editor">("viewer");
   const owner = role === "owner";
+  const [pw, setPw] = useState("");
+  const savePw = async (v: string) => {
+    if (!workspace) return;
+    const { error } = await supabase.rpc("set_share_password", { _ws: workspace.id, _pw: v });
+    if (error) { toast.error("Kunde inte spara lösenord"); return; }
+    setPw(""); await updateWorkspace({ share_has_password: !!v.trim() }); toast.success(v ? "Lösenord satt" : "Lösenord borttaget");
+  };
   if (!workspace) return null;
   const link = workspace.share_token ? `${window.location.origin}/delad/${workspace.share_token}` : "";
 
@@ -49,6 +56,13 @@ export function ShareDialog({ onClose }: { onClose: () => void }) {
                 <input readOnly className={field} value={link} onFocus={(e) => e.target.select()} />
                 <button className={btnGhost} aria-label="Kopiera länk" onClick={() => { navigator.clipboard.writeText(link); toast.success("Länken kopierad"); }}><Copy size={14} /></button>
                 <button className={btnGhost} aria-label="Byt länk" title="Byt länk (gamla slutar fungera)" onClick={() => updateWorkspace({ share_token: newToken() })}><RefreshCw size={14} /></button>
+              </div>
+            )}
+            {workspace.share_enabled && (
+              <div className="mt-3 flex gap-2">
+                <input type="password" className={field} placeholder={workspace.share_has_password ? "Lösenord satt – skriv nytt för att byta" : "Lösenord (valfritt)"} value={pw} onChange={(e) => setPw(e.target.value)} />
+                <button className={btnGhost} onClick={() => savePw(pw)}>Spara</button>
+                {workspace.share_has_password && <button className={btnGhost} onClick={() => savePw("")}>Ta bort</button>}
               </div>
             )}
           </section>

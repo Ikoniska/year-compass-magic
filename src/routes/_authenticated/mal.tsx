@@ -1,3 +1,4 @@
+import { Avatar, PersonFilter } from "@/components/Avatar";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Plus } from "lucide-react";
@@ -21,8 +22,11 @@ function Goals() {
   const { goals, saveGoal, people } = usePlanner();
   const [filter, setFilter] = useState<Category | "alla">("alla");
   const [edit, setEdit] = useState<Goal | "new" | null>(null);
+  const [who, setWho] = useState("");
+  const pick = (e: string) => people.find((p) => p.email === e);
   const list = goals
     .filter((g) => filter === "alla" || g.category === filter)
+    .filter((g) => !who || g.assignee === who || g.milestones.some((m) => m.assignee === who))
     .sort((a, b) => a.start - b.start || a.end - b.end || a.title.localeCompare(b.title, "sv"));
 
   return (
@@ -38,6 +42,7 @@ function Goals() {
           </button>
         ))}
       </div>
+      <div className="mb-6"><PersonFilter people={people} value={who} onChange={setWho} /></div>
       <div className="grid gap-4 md:grid-cols-2">
         {list.map((g) => {
           const c = cat(g.category); const p = goalProgress(g);
@@ -47,7 +52,7 @@ function Goals() {
                 <button onClick={() => setEdit(g)} className="text-left">
                   <span className={`mb-2 inline-block rounded-full px-2 py-0.5 text-[11px] font-medium ${c.cls}`}>{c.label}</span>
                   <h3 className="font-display text-lg font-semibold leading-snug group-hover:text-primary">{g.title}</h3>
-                  <p className="mt-0.5 text-xs text-muted-foreground">{MONTHS_SHORT[g.start]} – {MONTHS_SHORT[g.end]}{g.assignee ? ` · Ansvarig: ${people.find((p) => p.email === g.assignee)?.label ?? g.assignee}` : ""}</p>
+                  <p className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground">{MONTHS_SHORT[g.start]} – {MONTHS_SHORT[g.end]}{g.assignee && <><span>·</span><Avatar person={pick(g.assignee)} size={18} /><span>{pick(g.assignee)?.label ?? g.assignee}</span></>}</p>
                 </button>
                 <select value={g.status} onChange={(e) => saveGoal({ ...g, status: e.target.value as Goal["status"] })}
                   className={`rounded-md border px-2 py-1 text-xs font-medium status-${g.status}`} aria-label="Status">
@@ -65,7 +70,8 @@ function Goals() {
                       <label className="flex cursor-pointer items-center gap-2 text-sm">
                         <input type="checkbox" checked={m.done} className="accent-primary"
                           onChange={() => saveGoal({ ...g, milestones: g.milestones.map((x) => x.id === m.id ? { ...x, done: !x.done } : x) })} />
-                        <span className={m.done ? "text-muted-foreground line-through" : ""}>{m.title}</span>
+                        <span className={`flex-1 ${m.done ? "text-muted-foreground line-through" : ""}`}>{m.title}</span>
+                        {m.assignee && <Avatar person={pick(m.assignee)} size={18} />}
                       </label>
                     </li>
                   ))}

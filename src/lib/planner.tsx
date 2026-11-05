@@ -37,7 +37,7 @@ export type Reflections = Record<string, Record<string, string>>;
 const uid = () => crypto.randomUUID();
 
 export type Role = "owner" | "editor" | "viewer";
-export interface Workspace { id: string; name: string; owner_id: string; owner_email: string; share_token: string | null; share_enabled: boolean }
+export interface Workspace { id: string; name: string; owner_id: string; owner_email: string; share_token: string | null; share_enabled: boolean; share_has_password?: boolean }
 export interface Member { id: string; email: string; name: string; role: "viewer" | "editor" }
 export interface Person { email: string; label: string; initials: string; color: string }
 const PALETTE = ["var(--cat-arbete)", "var(--cat-halsa)", "var(--cat-ekonomi)", "var(--cat-utveckling)", "var(--cat-relationer)", "var(--primary)"];
