@@ -1,3 +1,4 @@
+import { Avatar, PersonFilter } from "@/components/Avatar";
 import { useEffect, useState } from "react";
 import { Target, Plus, X, Check } from "lucide-react";
 import { toast } from "sonner";

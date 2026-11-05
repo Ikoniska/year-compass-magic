@@ -1,3 +1,4 @@
+import { Avatar, PersonFilter } from "@/components/Avatar";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Plus } from "lucide-react";
