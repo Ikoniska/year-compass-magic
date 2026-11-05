@@ -19,7 +19,7 @@ export function ShareDialog({ onClose }: { onClose: () => void }) {
     if (!workspace) return;
     const { error } = await supabase.rpc("set_share_password", { _ws: workspace.id, _pw: v });
     if (error) { toast.error("Kunde inte spara lösenord"); return; }
-    setPw(""); await updateWorkspace({}); toast.success(v ? "Lösenord satt" : "Lösenord borttaget");
+    setPw(""); await updateWorkspace({ share_has_password: !!v.trim() }); toast.success(v ? "Lösenord satt" : "Lösenord borttaget");
   };
   if (!workspace) return null;
   const link = workspace.share_token ? `${window.location.origin}/delad/${workspace.share_token}` : "";
