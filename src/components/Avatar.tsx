@@ -1,6 +1,6 @@
 import type { Person } from "@/lib/planner";
 
-export function Avatar({ person, size = 22 }: { person?: Person; size?: number }) {
+export function Avatar({ person, size = 22 }: { person?: Person | undefined; size?: number }) {
   if (!person) return null;
   return (
     <span title={person.label} style={{ width: size, height: size, fontSize: size * 0.42 }}
