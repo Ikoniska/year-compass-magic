@@ -34,15 +34,25 @@ function Goals() {
       <PageHeader title="Mål" sub="Färgkodade efter kategori. Klicka på ett mål för att redigera.">
         <button className={btnPrimary} onClick={() => setEdit("new")}><Plus size={15} /> Nytt mål</button>
       </PageHeader>
-      <div className="mb-6 flex gap-2 overflow-x-auto pb-1">
-        {[{ id: "alla" as const, label: "Alla", cls: "bg-foreground text-background" }, ...CATEGORIES].map((c) => (
-          <button key={c.id} onClick={() => setFilter(c.id)}
-            className={`whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-medium ring-1 transition ${filter === c.id ? `${c.cls} ring-transparent` : "text-muted-foreground ring-border hover:text-foreground"}`}>
-            {c.label} <span className="opacity-60">{c.id === "alla" ? goals.length : goals.filter((g) => g.category === c.id).length}</span>
-          </button>
-        ))}
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <div className="max-w-full overflow-x-auto">
+          <div className="inline-flex gap-1 rounded-xl bg-muted/70 p-1">
+            {[{ id: "alla" as const, label: "Alla", dot: "bg-foreground" }, ...CATEGORIES].map((c) => {
+              const on = filter === c.id;
+              const n = c.id === "alla" ? goals.length : goals.filter((g) => g.category === c.id).length;
+              return (
+                <button key={c.id} onClick={() => setFilter(c.id)}
+                  className={`flex items-center gap-2 whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium transition ${on ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
+                  {c.id !== "alla" && <span className={`h-2 w-2 rounded-full ${c.dot}`} />}
+                  {c.label}
+                  <span className={`rounded-md px-1.5 text-[10px] tabular-nums ${on ? "bg-muted text-foreground" : "text-muted-foreground/70"}`}>{n}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        <PersonFilter people={people} value={who} onChange={setWho} />
       </div>
-      <div className="mb-6"><PersonFilter people={people} value={who} onChange={setWho} /></div>
       <div className="grid gap-4 md:grid-cols-2">
         {list.map((g) => {
           const c = cat(g.category); const p = goalProgress(g);
