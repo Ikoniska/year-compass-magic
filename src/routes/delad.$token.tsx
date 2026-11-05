@@ -118,7 +118,7 @@ function Shared() {
         <div className="relative mt-8 h-[700px] overflow-auto rounded-2xl border bg-muted/30">
           {plan.notes.map((n) => (
             <div key={n.id} className="absolute rounded-md p-3 text-sm text-neutral-900 shadow"
-              style={{ left: n.x, top: n.y, width: n.width, minHeight: n.height, transform: `rotate(${n.rotation}deg)`, background: NOTE_BG[n.color] ?? NOTE_BG.yellow }}>
+              style={{ left: n.x, top: n.y, width: n.width, minHeight: n.height, transform: `rotate(${n.rotation}deg)`, background: NOTE_BG[n.color] ?? NOTE_BG["yellow"] }}>
               <p className="whitespace-pre-wrap">{n.content}</p>
               {n.is_checklist && <ul className="mt-1">{(n.items ?? []).map((it, i) => <li key={i} className={it.done ? "line-through opacity-60" : ""}>{it.done ? "☑" : "☐"} {it.text}</li>)}</ul>}
             </div>
