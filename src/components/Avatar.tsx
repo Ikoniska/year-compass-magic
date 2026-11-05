@@ -13,12 +13,12 @@ export function Avatar({ person, size = 22 }: { person?: Person | undefined; siz
 export function PersonFilter({ people, value, onChange }: { people: Person[]; value: string; onChange: (v: string) => void }) {
   if (people.length < 2) return null;
   return (
-    <div className="flex flex-wrap items-center gap-1.5">
+    <div className="inline-flex items-center gap-1 rounded-xl bg-muted/70 p-1">
       <button onClick={() => onChange("")}
-        className={`rounded-full px-2.5 py-1 text-xs ring-1 ${value === "" ? "bg-foreground text-background ring-transparent" : "text-muted-foreground ring-border"}`}>Alla</button>
+        className={`rounded-lg px-3 py-1.5 text-xs font-medium transition ${value === "" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>Alla</button>
       {people.map((p) => (
         <button key={p.email} onClick={() => onChange(p.email)} title={p.label}
-          className={`rounded-full p-0.5 ring-2 ${value === p.email ? "ring-primary" : "ring-transparent"}`}>
+          className={`rounded-lg p-1 transition ${value === p.email ? "bg-card shadow-sm" : "opacity-70 hover:opacity-100"}`}>
           <Avatar person={p} />
         </button>
       ))}
