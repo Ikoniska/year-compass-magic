@@ -39,7 +39,16 @@ export function ShareDialog({ onClose }: { onClose: () => void }) {
   return (
     <Modal title={`Dela "${workspace.name}"`} onClose={onClose}>
       {!owner ? (
-        <p className="text-sm text-muted-foreground">Du är {role === "editor" ? "medredaktör" : "tittare"} i den här planen. Bara ägaren ({workspace.owner_email}) kan ändra delning.</p>
+        <div className="space-y-4">
+          <p className="text-sm text-muted-foreground">Du är {role === "editor" ? "medredaktör" : "tittare"} i den här planen. Bara ägaren kan ändra delning.</p>
+          <h3 className="text-sm font-semibold">Personer i planen ({members.length + 1})</h3>
+          <ul className="divide-y rounded-lg border">
+            <li className="flex items-center gap-2 px-3 py-2 text-sm"><Who name={workspace.owner_name} email={workspace.owner_email} /><span className="text-xs text-muted-foreground">Ägare</span></li>
+            {members.map((m) => (
+              <li key={m.id} className="flex items-center gap-2 px-3 py-2 text-sm"><Who name={m.name} email={m.email} /><span className="text-xs text-muted-foreground">{m.role === "editor" ? "Medredaktör" : "Tittare"}</span></li>
+            ))}
+          </ul>
+        </div>
       ) : (
         <div className="space-y-6">
           <section>
@@ -76,11 +85,12 @@ export function ShareDialog({ onClose }: { onClose: () => void }) {
               </select>
             </div>
             <button className={`${btnPrimary} mt-2 w-full`} onClick={invite}><UserPlus size={14} /> Bjud in</button>
-            <ul className="mt-4 divide-y rounded-lg border">
-              <li className="flex items-center justify-between px-3 py-2 text-sm"><span className="truncate">{workspace.owner_email}</span><span className="text-xs text-muted-foreground">Ägare</span></li>
+            <h3 className="mt-5 text-sm font-semibold">Personer i planen ({members.length + 1})</h3>
+            <ul className="mt-2 divide-y rounded-lg border">
+              <li className="flex items-center gap-2 px-3 py-2 text-sm"><Who name={workspace.owner_name} email={workspace.owner_email} /><span className="text-xs text-muted-foreground">Ägare</span></li>
               {members.map((m) => (
                 <li key={m.id} className="flex items-center gap-2 px-3 py-2 text-sm">
-                  <span className="flex-1 truncate" title={m.email}>{m.name || m.email}</span>
+                  <Who name={m.name} email={m.email} />
                   <select className="rounded-md border bg-background px-1 py-0.5 text-xs" value={m.role} onChange={(e) => setRole(m.id, e.target.value)}>
                     <option value="viewer">Tittare</option><option value="editor">Medredaktör</option>
                   </select>
@@ -92,5 +102,14 @@ export function ShareDialog({ onClose }: { onClose: () => void }) {
         </div>
       )}
     </Modal>
+  );
+}
+
+function Who({ name, email }: { name?: string; email: string }) {
+  return (
+    <span className="min-w-0 flex-1">
+      <span className="block truncate font-medium">{name || email}</span>
+      {name && <span className="block truncate text-xs text-muted-foreground">{email}</span>}
+    </span>
   );
 }
