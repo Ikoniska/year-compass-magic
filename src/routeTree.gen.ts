@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthenticatedAnteckningarRouteImport } from './routes/_authenticated/anteckningar'
 import { Route as AuthenticatedArsbokslutRouteImport } from './routes/_authenticated/arsbokslut'
 import { Route as AuthenticatedMalRouteImport } from './routes/_authenticated/mal'
 import { Route as AuthenticatedOversiktRouteImport } from './routes/_authenticated/oversikt'
@@ -21,6 +22,7 @@ import { Route as AuthenticatedReflektionRouteImport } from './routes/_authentic
 import { Route as AuthenticatedTidslinjeRouteImport } from './routes/_authenticated/tidslinje'
 import { Route as AuthenticatedWhiteboardRouteImport } from './routes/_authenticated/whiteboard'
 import { Route as DeladTokenRouteImport } from './routes/delad.$token'
+import { Route as AuthenticatedProjektGoalIdRouteImport } from './routes/_authenticated/projekt.$goalId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -41,6 +43,12 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAnteckningarRoute =
+  AuthenticatedAnteckningarRouteImport.update({
+    id: '/anteckningar',
+    path: '/anteckningar',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedArsbokslutRoute = AuthenticatedArsbokslutRouteImport.update({
   id: '/arsbokslut',
   path: '/arsbokslut',
@@ -81,11 +89,18 @@ const DeladTokenRoute = DeladTokenRouteImport.update({
   path: '/delad/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedProjektGoalIdRoute =
+  AuthenticatedProjektGoalIdRouteImport.update({
+    id: '/projekt/$goalId',
+    path: '/projekt/$goalId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/anteckningar': typeof AuthenticatedAnteckningarRoute
   '/arsbokslut': typeof AuthenticatedArsbokslutRoute
   '/mal': typeof AuthenticatedMalRoute
   '/oversikt': typeof AuthenticatedOversiktRoute
@@ -94,11 +109,13 @@ export interface FileRoutesByFullPath {
   '/tidslinje': typeof AuthenticatedTidslinjeRoute
   '/whiteboard': typeof AuthenticatedWhiteboardRoute
   '/delad/$token': typeof DeladTokenRoute
+  '/projekt/$goalId': typeof AuthenticatedProjektGoalIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/anteckningar': typeof AuthenticatedAnteckningarRoute
   '/arsbokslut': typeof AuthenticatedArsbokslutRoute
   '/mal': typeof AuthenticatedMalRoute
   '/oversikt': typeof AuthenticatedOversiktRoute
@@ -107,6 +124,7 @@ export interface FileRoutesByTo {
   '/tidslinje': typeof AuthenticatedTidslinjeRoute
   '/whiteboard': typeof AuthenticatedWhiteboardRoute
   '/delad/$token': typeof DeladTokenRoute
+  '/projekt/$goalId': typeof AuthenticatedProjektGoalIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -114,6 +132,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/anteckningar': typeof AuthenticatedAnteckningarRoute
   '/_authenticated/arsbokslut': typeof AuthenticatedArsbokslutRoute
   '/_authenticated/mal': typeof AuthenticatedMalRoute
   '/_authenticated/oversikt': typeof AuthenticatedOversiktRoute
@@ -122,6 +141,7 @@ export interface FileRoutesById {
   '/_authenticated/tidslinje': typeof AuthenticatedTidslinjeRoute
   '/_authenticated/whiteboard': typeof AuthenticatedWhiteboardRoute
   '/delad/$token': typeof DeladTokenRoute
+  '/_authenticated/projekt/$goalId': typeof AuthenticatedProjektGoalIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -129,6 +149,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/reset-password'
+    | '/anteckningar'
     | '/arsbokslut'
     | '/mal'
     | '/oversikt'
@@ -137,11 +158,13 @@ export interface FileRouteTypes {
     | '/tidslinje'
     | '/whiteboard'
     | '/delad/$token'
+    | '/projekt/$goalId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/reset-password'
+    | '/anteckningar'
     | '/arsbokslut'
     | '/mal'
     | '/oversikt'
@@ -150,12 +173,14 @@ export interface FileRouteTypes {
     | '/tidslinje'
     | '/whiteboard'
     | '/delad/$token'
+    | '/projekt/$goalId'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/reset-password'
+    | '/_authenticated/anteckningar'
     | '/_authenticated/arsbokslut'
     | '/_authenticated/mal'
     | '/_authenticated/oversikt'
@@ -164,6 +189,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tidslinje'
     | '/_authenticated/whiteboard'
     | '/delad/$token'
+    | '/_authenticated/projekt/$goalId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -203,6 +229,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/anteckningar': {
+      id: '/_authenticated/anteckningar'
+      path: '/anteckningar'
+      fullPath: '/anteckningar'
+      preLoaderRoute: typeof AuthenticatedAnteckningarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/arsbokslut': {
       id: '/_authenticated/arsbokslut'
@@ -260,10 +293,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DeladTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/projekt/$goalId': {
+      id: '/_authenticated/projekt/$goalId'
+      path: '/projekt/$goalId'
+      fullPath: '/projekt/$goalId'
+      preLoaderRoute: typeof AuthenticatedProjektGoalIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAnteckningarRoute: typeof AuthenticatedAnteckningarRoute
   AuthenticatedArsbokslutRoute: typeof AuthenticatedArsbokslutRoute
   AuthenticatedMalRoute: typeof AuthenticatedMalRoute
   AuthenticatedOversiktRoute: typeof AuthenticatedOversiktRoute
@@ -271,9 +312,11 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedReflektionRoute: typeof AuthenticatedReflektionRoute
   AuthenticatedTidslinjeRoute: typeof AuthenticatedTidslinjeRoute
   AuthenticatedWhiteboardRoute: typeof AuthenticatedWhiteboardRoute
+  AuthenticatedProjektGoalIdRoute: typeof AuthenticatedProjektGoalIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAnteckningarRoute: AuthenticatedAnteckningarRoute,
   AuthenticatedArsbokslutRoute: AuthenticatedArsbokslutRoute,
   AuthenticatedMalRoute: AuthenticatedMalRoute,
   AuthenticatedOversiktRoute: AuthenticatedOversiktRoute,
@@ -281,6 +324,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedReflektionRoute: AuthenticatedReflektionRoute,
   AuthenticatedTidslinjeRoute: AuthenticatedTidslinjeRoute,
   AuthenticatedWhiteboardRoute: AuthenticatedWhiteboardRoute,
+  AuthenticatedProjektGoalIdRoute: AuthenticatedProjektGoalIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

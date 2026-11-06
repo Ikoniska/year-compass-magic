@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Plus, Trash2, Target, ListChecks, X, Pencil, Undo2, Eraser, RotateCw } from "lucide-react";
+import { Plus, Trash2, Target, FolderInput, ListChecks, X, Pencil, Undo2, Eraser, RotateCw } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/AppShell";
 import { GoalDialog } from "@/components/Dialogs";
@@ -147,6 +147,13 @@ function Whiteboard() {
     });
   }
 
+  async function toProject(n: Note, goalId: string) {
+    const title = n.content.split("\n").map((x) => x.trim()).filter(Boolean)[0] ?? "Ny uppgift";
+    const { error } = await supabase.from("project_tasks").insert({ title, goal_id: goalId, workspace_id: wsId, position: Date.now() });
+    if (error) { toast.error("Kunde inte flytta"); return; }
+    await remove(n.id); setMoving(""); toast.success("Lappen ligger nu i projektets Att göra");
+  }
+
   function startDrag(e: React.PointerEvent, note: Note) {
     if ((e.target as HTMLElement).closest("textarea,button,input")) return;
     e.preventDefault();
@@ -262,6 +269,7 @@ function Whiteboard() {
                 <div className="flex gap-2">
                   <button aria-label="Växla checklista" title="Checklista" onClick={() => update(n.id, { is_checklist: !n.is_checklist })} className="hover:opacity-70"><ListChecks size={14} /></button>
                   <button aria-label="Gör till mål" title="Gör till mål" onClick={() => toGoal(n)} className="hover:opacity-70"><Target size={14} /></button>
+                  <button aria-label="Flytta till projekt" title="Flytta till projekt" onClick={() => setMoving(moving === n.id ? "" : n.id)} className="hover:opacity-70"><FolderInput size={14} /></button>
                   <button aria-label="Ta bort" onClick={() => remove(n.id)} className="hover:opacity-70"><Trash2 size={14} /></button>
                 </div>
               </div>

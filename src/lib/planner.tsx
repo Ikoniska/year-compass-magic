@@ -37,7 +37,7 @@ export type Reflections = Record<string, Record<string, string>>;
 const uid = () => crypto.randomUUID();
 
 export type Role = "owner" | "editor" | "viewer";
-export interface Workspace { id: string; name: string; owner_id: string; owner_email: string; share_token: string | null; share_enabled: boolean; share_has_password?: boolean }
+export interface Workspace { id: string; name: string; owner_id: string; owner_email: string; share_token: string | null; share_enabled: boolean; share_has_password?: boolean; owner_name?: string }
 export interface Member { id: string; email: string; name: string; role: "viewer" | "editor" }
 export interface Person { email: string; label: string; initials: string; color: string }
 const PALETTE = ["var(--cat-arbete)", "var(--cat-halsa)", "var(--cat-ekonomi)", "var(--cat-utveckling)", "var(--cat-relationer)", "var(--primary)"];
@@ -45,7 +45,7 @@ export const initials = (s: string) => (s.split(/[\s@._-]+/).filter(Boolean).sli
 
 interface Ctx {
   wsId: string; workspaces: Workspace[]; workspace: Workspace | undefined; role: Role; canEdit: boolean;
-  members: Member[]; people: Person[]; me: string;
+  members: Member[]; people: Person[]; me: string; myName: string; setDisplayName: (n: string) => Promise<void>;
   switchWorkspace: (id: string) => void; reloadMembers: () => void; updateWorkspace: (p: Partial<Workspace>) => Promise<void>;
   createWorkspace: (name: string) => Promise<void>; deleteWorkspace: () => Promise<void>;
   goals: Goal[]; events: PlanEvent[]; reflections: Reflections; loading: boolean;
@@ -69,12 +69,14 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
   const [members, setMembers] = useState<Member[]>([]);
   const [me, setMe] = useState("");
   const [uidSelf, setUid] = useState("");
+  const [myName, setMyName] = useState("");
 
   useEffect(() => {
     (async () => {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) return;
       setMe(u.user.email ?? ""); setUid(u.user.id);
+      supabase.from("profiles").select("display_name").eq("id", u.user.id).maybeSingle().then(({ data }) => setMyName(data?.display_name ?? ""));
       let { data: ws } = await supabase.from("workspaces").select("*").order("created_at");
       if (!ws?.some((w) => w.owner_id === u.user!.id)) {
         await supabase.from("workspaces").insert({ owner_id: u.user.id, owner_email: u.user.email ?? "" });
@@ -120,9 +122,18 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
   const role: Role = workspace?.owner_id === uidSelf ? "owner" : myMember?.role ?? "viewer";
   const canEdit = role !== "viewer";
   const people: Person[] = [
-    ...(workspace ? [{ email: workspace.owner_email, label: workspace.owner_email }] : []),
+    ...(workspace ? [{ email: workspace.owner_email, label: workspace.owner_name || workspace.owner_email }] : []),
     ...members.map((m) => ({ email: m.email, label: m.name || m.email })),
   ].map((p, i) => ({ ...p, initials: initials(p.label), color: PALETTE[i % PALETTE.length]! }));
+  const setDisplayName = async (n: string) => {
+    const { error } = await supabase.rpc("set_display_name", { _name: n });
+    fail(error);
+    if (!error) {
+      setMyName(n.trim());
+      setWorkspaces((l) => l.map((w) => (w.owner_id === uidSelf ? { ...w, owner_name: n.trim() } : w)));
+      reloadMembers(); toast.success("Namnet sparades");
+    }
+  };
   const switchWorkspace = (id: string) => { localStorage.setItem("ws", id); setWsId(id); };
   const createWorkspace = async (name: string) => {
     const { data: u } = await supabase.auth.getUser();
@@ -194,7 +205,7 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <PlannerCtx.Provider value={{ wsId, workspaces, workspace, role, canEdit, members, people, me, switchWorkspace, reloadMembers, updateWorkspace, createWorkspace, deleteWorkspace, goals, events, reflections, loading, newId: uid, saveGoal, deleteGoal, saveEvent, deleteEvent, setReflection }}>
+    <PlannerCtx.Provider value={{ wsId, workspaces, workspace, role, canEdit, members, people, me, myName, setDisplayName, switchWorkspace, reloadMembers, updateWorkspace, createWorkspace, deleteWorkspace, goals, events, reflections, loading, newId: uid, saveGoal, deleteGoal, saveEvent, deleteEvent, setReflection }}>
       {children}
     </PlannerCtx.Provider>
   );

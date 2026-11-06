@@ -148,6 +148,130 @@ export type Database = {
         }
         Relationships: []
       }
+      notes: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          display_name: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          display_name?: string
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          display_name?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      project_status: {
+        Row: {
+          blockers: string
+          goal_id: string
+          health: string
+          progress: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          blockers?: string
+          goal_id: string
+          health?: string
+          progress?: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          blockers?: string
+          goal_id?: string
+          health?: string
+          progress?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_status_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_tasks: {
+        Row: {
+          assignee: string
+          col: string
+          created_at: string
+          due: string | null
+          goal_id: string
+          id: string
+          position: number
+          title: string
+          workspace_id: string
+        }
+        Insert: {
+          assignee?: string
+          col?: string
+          created_at?: string
+          due?: string | null
+          goal_id: string
+          id?: string
+          position?: number
+          title?: string
+          workspace_id: string
+        }
+        Update: {
+          assignee?: string
+          col?: string
+          created_at?: string
+          due?: string | null
+          goal_id?: string
+          id?: string
+          position?: number
+          title?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_tasks_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quarter_comments: {
         Row: {
           author_name: string
@@ -392,6 +516,7 @@ export type Database = {
           name: string
           owner_email: string
           owner_id: string
+          owner_name: string
           share_enabled: boolean
           share_has_password: boolean
           share_token: string | null
@@ -402,6 +527,7 @@ export type Database = {
           name?: string
           owner_email?: string
           owner_id: string
+          owner_name?: string
           share_enabled?: boolean
           share_has_password?: boolean
           share_token?: string | null
@@ -412,6 +538,7 @@ export type Database = {
           name?: string
           owner_email?: string
           owner_id?: string
+          owner_name?: string
           share_enabled?: boolean
           share_has_password?: boolean
           share_token?: string | null
@@ -465,6 +592,7 @@ export type Database = {
         Returns: Json
       }
       personal_workspace: { Args: { _uid: string }; Returns: string }
+      set_display_name: { Args: { _name: string }; Returns: undefined }
       set_share_password: {
         Args: { _pw: string; _ws: string }
         Returns: undefined
