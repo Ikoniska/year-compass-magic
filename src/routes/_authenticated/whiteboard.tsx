@@ -39,7 +39,8 @@ type LayoutKey = keyof typeof LAYOUTS;
 const BOARD_W = 1200;
 
 function Whiteboard() {
-  const { newId, wsId } = usePlanner();
+  const { newId, wsId, goals } = usePlanner();
+  const [moving, setMoving] = useState("");
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
   const [layout, setLayout] = useState<LayoutKey>("fri");
@@ -270,6 +271,12 @@ function Whiteboard() {
                   <button aria-label="Växla checklista" title="Checklista" onClick={() => update(n.id, { is_checklist: !n.is_checklist })} className="hover:opacity-70"><ListChecks size={14} /></button>
                   <button aria-label="Gör till mål" title="Gör till mål" onClick={() => toGoal(n)} className="hover:opacity-70"><Target size={14} /></button>
                   <button aria-label="Flytta till projekt" title="Flytta till projekt" onClick={() => setMoving(moving === n.id ? "" : n.id)} className="hover:opacity-70"><FolderInput size={14} /></button>
+                  {moving === n.id && (
+                    <select autoFocus aria-label="Välj projekt" defaultValue="" onChange={(e) => e.target.value && toProject(n, e.target.value)} className="max-w-[7rem] rounded border bg-background text-[11px] text-foreground">
+                      <option value="" disabled>Välj projekt…</option>
+                      {goals.map((g) => <option key={g.id} value={g.id}>{g.title}</option>)}
+                    </select>
+                  )}
                   <button aria-label="Ta bort" onClick={() => remove(n.id)} className="hover:opacity-70"><Trash2 size={14} /></button>
                 </div>
               </div>
