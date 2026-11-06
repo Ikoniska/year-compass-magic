@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthenticatedAnteckningarRouteImport } from './routes/_authenticated/anteckningar'
 import { Route as AuthenticatedArsbokslutRouteImport } from './routes/_authenticated/arsbokslut'
 import { Route as AuthenticatedMalRouteImport } from './routes/_authenticated/mal'
 import { Route as AuthenticatedOversiktRouteImport } from './routes/_authenticated/oversikt'
@@ -41,6 +42,12 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAnteckningarRoute =
+  AuthenticatedAnteckningarRouteImport.update({
+    id: '/anteckningar',
+    path: '/anteckningar',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedArsbokslutRoute = AuthenticatedArsbokslutRouteImport.update({
   id: '/arsbokslut',
   path: '/arsbokslut',
@@ -86,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/anteckningar': typeof AuthenticatedAnteckningarRoute
   '/arsbokslut': typeof AuthenticatedArsbokslutRoute
   '/mal': typeof AuthenticatedMalRoute
   '/oversikt': typeof AuthenticatedOversiktRoute
@@ -99,6 +107,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/anteckningar': typeof AuthenticatedAnteckningarRoute
   '/arsbokslut': typeof AuthenticatedArsbokslutRoute
   '/mal': typeof AuthenticatedMalRoute
   '/oversikt': typeof AuthenticatedOversiktRoute
@@ -114,6 +123,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/anteckningar': typeof AuthenticatedAnteckningarRoute
   '/_authenticated/arsbokslut': typeof AuthenticatedArsbokslutRoute
   '/_authenticated/mal': typeof AuthenticatedMalRoute
   '/_authenticated/oversikt': typeof AuthenticatedOversiktRoute
@@ -129,6 +139,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/reset-password'
+    | '/anteckningar'
     | '/arsbokslut'
     | '/mal'
     | '/oversikt'
@@ -142,6 +153,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/reset-password'
+    | '/anteckningar'
     | '/arsbokslut'
     | '/mal'
     | '/oversikt'
@@ -156,6 +168,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/reset-password'
+    | '/_authenticated/anteckningar'
     | '/_authenticated/arsbokslut'
     | '/_authenticated/mal'
     | '/_authenticated/oversikt'
@@ -203,6 +216,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/anteckningar': {
+      id: '/_authenticated/anteckningar'
+      path: '/anteckningar'
+      fullPath: '/anteckningar'
+      preLoaderRoute: typeof AuthenticatedAnteckningarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/arsbokslut': {
       id: '/_authenticated/arsbokslut'
@@ -264,6 +284,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAnteckningarRoute: typeof AuthenticatedAnteckningarRoute
   AuthenticatedArsbokslutRoute: typeof AuthenticatedArsbokslutRoute
   AuthenticatedMalRoute: typeof AuthenticatedMalRoute
   AuthenticatedOversiktRoute: typeof AuthenticatedOversiktRoute
@@ -274,6 +295,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAnteckningarRoute: AuthenticatedAnteckningarRoute,
   AuthenticatedArsbokslutRoute: AuthenticatedArsbokslutRoute,
   AuthenticatedMalRoute: AuthenticatedMalRoute,
   AuthenticatedOversiktRoute: AuthenticatedOversiktRoute,

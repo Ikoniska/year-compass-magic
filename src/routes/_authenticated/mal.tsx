@@ -1,7 +1,7 @@
 import { Avatar, PersonFilter } from "@/components/Avatar";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Plus } from "lucide-react";
+import { Plus, KanbanSquare } from "lucide-react";
 import { PageHeader } from "@/components/AppShell";
 import { GoalDialog, btnPrimary } from "@/components/Dialogs";
 import { CATEGORIES, MONTHS_SHORT, STATUSES, cat, goalProgress, statusLabel, usePlanner, type Category, type Goal } from "@/lib/planner";
@@ -9,9 +9,9 @@ import { CATEGORIES, MONTHS_SHORT, STATUSES, cat, goalProgress, statusLabel, use
 export const Route = createFileRoute("/_authenticated/mal")({
   head: () => ({
     meta: [
-      { title: "Mål – Ikoniska" },
+      { title: "Mål & projekt – Ikoniska" },
       { name: "description", content: "Skapa mål per kategori, sätt status och bocka av delmål." },
-      { property: "og:title", content: "Mål – Ikoniska" },
+      { property: "og:title", content: "Mål & projekt – Ikoniska" },
       { property: "og:description", content: "Skapa mål per kategori, sätt status och bocka av delmål." },
     ],
   }),
@@ -87,6 +87,7 @@ function Goals() {
                   ))}
                 </ul>
               )}
+              <Link to="/projekt/$goalId" params={{ goalId: g.id }} className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"><KanbanSquare size={14} /> Öppna projekt</Link>
               <p className="sr-only">{statusLabel(g.status)}</p>
             </article>
           );
