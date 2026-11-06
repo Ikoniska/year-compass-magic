@@ -22,6 +22,7 @@ import { Route as AuthenticatedReflektionRouteImport } from './routes/_authentic
 import { Route as AuthenticatedTidslinjeRouteImport } from './routes/_authenticated/tidslinje'
 import { Route as AuthenticatedWhiteboardRouteImport } from './routes/_authenticated/whiteboard'
 import { Route as DeladTokenRouteImport } from './routes/delad.$token'
+import { Route as AuthenticatedProjektGoalIdRouteImport } from './routes/_authenticated/projekt.$goalId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -88,6 +89,12 @@ const DeladTokenRoute = DeladTokenRouteImport.update({
   path: '/delad/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedProjektGoalIdRoute =
+  AuthenticatedProjektGoalIdRouteImport.update({
+    id: '/projekt/$goalId',
+    path: '/projekt/$goalId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -102,6 +109,7 @@ export interface FileRoutesByFullPath {
   '/tidslinje': typeof AuthenticatedTidslinjeRoute
   '/whiteboard': typeof AuthenticatedWhiteboardRoute
   '/delad/$token': typeof DeladTokenRoute
+  '/projekt/$goalId': typeof AuthenticatedProjektGoalIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -116,6 +124,7 @@ export interface FileRoutesByTo {
   '/tidslinje': typeof AuthenticatedTidslinjeRoute
   '/whiteboard': typeof AuthenticatedWhiteboardRoute
   '/delad/$token': typeof DeladTokenRoute
+  '/projekt/$goalId': typeof AuthenticatedProjektGoalIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -132,6 +141,7 @@ export interface FileRoutesById {
   '/_authenticated/tidslinje': typeof AuthenticatedTidslinjeRoute
   '/_authenticated/whiteboard': typeof AuthenticatedWhiteboardRoute
   '/delad/$token': typeof DeladTokenRoute
+  '/_authenticated/projekt/$goalId': typeof AuthenticatedProjektGoalIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -148,6 +158,7 @@ export interface FileRouteTypes {
     | '/tidslinje'
     | '/whiteboard'
     | '/delad/$token'
+    | '/projekt/$goalId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -162,6 +173,7 @@ export interface FileRouteTypes {
     | '/tidslinje'
     | '/whiteboard'
     | '/delad/$token'
+    | '/projekt/$goalId'
   id:
     | '__root__'
     | '/'
@@ -177,6 +189,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tidslinje'
     | '/_authenticated/whiteboard'
     | '/delad/$token'
+    | '/_authenticated/projekt/$goalId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -280,6 +293,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DeladTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/projekt/$goalId': {
+      id: '/_authenticated/projekt/$goalId'
+      path: '/projekt/$goalId'
+      fullPath: '/projekt/$goalId'
+      preLoaderRoute: typeof AuthenticatedProjektGoalIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -292,6 +312,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedReflektionRoute: typeof AuthenticatedReflektionRoute
   AuthenticatedTidslinjeRoute: typeof AuthenticatedTidslinjeRoute
   AuthenticatedWhiteboardRoute: typeof AuthenticatedWhiteboardRoute
+  AuthenticatedProjektGoalIdRoute: typeof AuthenticatedProjektGoalIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -303,6 +324,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedReflektionRoute: AuthenticatedReflektionRoute,
   AuthenticatedTidslinjeRoute: AuthenticatedTidslinjeRoute,
   AuthenticatedWhiteboardRoute: AuthenticatedWhiteboardRoute,
+  AuthenticatedProjektGoalIdRoute: AuthenticatedProjektGoalIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
