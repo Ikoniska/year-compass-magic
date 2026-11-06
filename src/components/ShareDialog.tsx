@@ -105,7 +105,7 @@ export function ShareDialog({ onClose }: { onClose: () => void }) {
   );
 }
 
-function Who({ name, email }: { name?: string; email: string }) {
+function Who({ name, email }: { name?: string | undefined; email: string }) {
   return (
     <span className="min-w-0 flex-1">
       <span className="block truncate font-medium">{name || email}</span>
